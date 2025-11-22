@@ -10,47 +10,94 @@ import {
   Link,
   Button,
 } from "@heroui/react";
+import Lottie from 'react-lottie';
+import { useLocation } from "react-router-dom";
+import SpongebobJSON from '@/assets/spongebob.json';
+import { CLIENT_ROUTES } from "@/domain/client/routes";
+import clsx from "clsx";
+
+export const defaultOptionsLottie = {
+    loop: true,
+    autoplay: true,
+    rendererSettings: {
+        preserveAspectRatio: 'xMidYMid slice'
+    }
+};
 
 export default function Header() {
+  const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
 
   const menuItems = [
-    "Rádio",
-    "Xanvídeos",
-    "Link para live (Já vejo já irmão)",
-    "Postagens da comunidade"
+    { text: "Rádio", path: CLIENT_ROUTES.Radio },
+    { text: "Vídeos", path: CLIENT_ROUTES.Xanvideos },
+    { text: "Democracia da Live", path: CLIENT_ROUTES.Links },
+    { text: "Postagens da comunidade", path: CLIENT_ROUTES.Community },
   ];
 
   return (
-    <Navbar isBordered isMenuOpen={isMenuOpen} onMenuOpenChange={setIsMenuOpen} maxWidth="2xl">
+    <Navbar
+      isBordered
+      maxWidth="2xl"
+      isMenuOpen={isMenuOpen}
+      onMenuOpenChange={setIsMenuOpen}
+      classNames={{
+        item: [
+          "flex",
+          "relative",
+          "h-full",
+          "items-center",
+          "data-[active=true]:after:content-['']",
+          "data-[active=true]:after:absolute",
+          "data-[active=true]:after:bottom-0",
+          "data-[active=true]:after:left-0",
+          "data-[active=true]:after:right-0",
+          "data-[active=true]:after:h-[4px]",
+          "data-[active=true]:after:rounded-[2px]",
+          "data-[active=true]:after:bg-danger",
+        ],
+      }}
+    >
       <NavbarContent className="lg:hidden" justify="start">
         <NavbarMenuToggle aria-label={isMenuOpen ? "Close menu" : "Open menu"} />
       </NavbarContent>
       <NavbarContent className="lg:hidden pr-3" justify="center">
-        <NavbarBrand>
-          <p className="font-bold text-inherit">StompeBob MIX</p>
+        <NavbarBrand className="flex flex-row items-center">
+          <Lottie
+              width={30}
+              height={30}
+              isClickToPauseDisabled
+              options={{...defaultOptionsLottie, animationData: SpongebobJSON }}
+          />
+          <p className="font-bold text-inherit text-xs sm:text-lg">StompeBob MIX</p>
         </NavbarBrand>
       </NavbarContent>
       <NavbarContent className="hidden lg:flex gap-10" justify="center">
-        <NavbarBrand>
+        <NavbarBrand className="flex flex-row items-center">
+          <Lottie
+              width={50}
+              height={50}
+              isClickToPauseDisabled
+              options={{...defaultOptionsLottie, animationData: SpongebobJSON }}
+          />
           <p className="font-bold text-inherit text-xl">StompeBob Mix</p>
         </NavbarBrand>
-        <NavbarItem>
-          <Link color="foreground" href="#">
+        <NavbarItem isActive={location.pathname === CLIENT_ROUTES.Radio}>
+          <Link color={"foreground"} href="#">
             Rádio
           </Link>
         </NavbarItem>
-        <NavbarItem>
+        <NavbarItem isActive={location.pathname === CLIENT_ROUTES.Xanvideos}>
           <Link color="foreground" href="#">
-            Xanvídeos
+            Vídeos
           </Link>
         </NavbarItem>
-        <NavbarItem>
+        <NavbarItem isActive={location.pathname === CLIENT_ROUTES.Xanvideos}>
           <Link color="foreground" href="#">
-            Link para live&nbsp;<b>Já vejo já irmão</b>
+            Democracia da Live
           </Link>
         </NavbarItem>
-        <NavbarItem>
+        <NavbarItem isActive={location.pathname === CLIENT_ROUTES.Community}>
           <Link color="foreground" href="#">
             Postagens da comunidade
           </Link>
@@ -67,15 +114,15 @@ export default function Header() {
         </NavbarItem>
       </NavbarContent>
       <NavbarMenu>
-        {menuItems.map((item, index) => (
-          <NavbarMenuItem key={`${item}-${index}`}>
+        {menuItems.map(({ text, path }, index) => (
+          <NavbarMenuItem key={`link-${index}`}>
             <Link
               className="w-full"
               color={"foreground"}
               href="#"
               size="lg"
             >
-              {item}
+              <span className={clsx({ "border-b-4 border-b-red-400 font-bold": location.pathname === path })} dangerouslySetInnerHTML={{ __html: text }}/>
             </Link>
           </NavbarMenuItem>
         ))}

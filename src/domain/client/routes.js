@@ -1,3 +1,6 @@
 export const CLIENT_ROUTES = {
-    Radio: '/'
-}
+    Radio: '/',
+    Xanvideos: '/xanvideos',
+    Links: '/links',
+    Community: '/community'
+};
