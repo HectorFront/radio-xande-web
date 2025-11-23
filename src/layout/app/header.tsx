@@ -34,7 +34,7 @@ export default function Header() {
     { text: "Vídeos", path: CLIENT_ROUTES.Xanvideos },
     { text: "Democracia da Live", path: CLIENT_ROUTES.Links },
     { text: "Chat comunidade", path: CLIENT_ROUTES.Community },
-    { text: "Quem fez?", path: '' },
+    { text: "Sobre", path: '' },
   ];
 
   return (
@@ -106,7 +106,7 @@ export default function Header() {
         </NavbarItem>
         <NavbarItem isActive={location.pathname === CLIENT_ROUTES.Community}>
           <Link className="cursor-pointer hover:opacity-80" color="foreground">
-            Quem fez?
+            Sobre
           </Link>
         </NavbarItem>
       </NavbarContent>

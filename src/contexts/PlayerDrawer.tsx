@@ -236,7 +236,6 @@ export const PlayerDrawerProvider = memo(({ children }: { children: ReactNode })
             currentMusicDrawer: currentMusic,
             handleSeekingTimeMusic: setSeekingTime
         }}>
-            {children}
             {isOpen && (
                 <div
                     className="fixed bottom-0 left-0 right-0 bg-neutral-950/95 rounded-t-xl px-6 py-3 h-28 z-50"
@@ -251,7 +250,7 @@ export const PlayerDrawerProvider = memo(({ children }: { children: ReactNode })
                         <div className="flex-1">
                             <div className="flex flex-row items-start justify-between">
                                 <div className="text-start">
-                                    <h2 className="text-sm font-bold text-white m-0">{currentMusic?.description}</h2>
+                                    <h2 className="text-sm font-bold text-white m-0 line-clamp-1">{currentMusic?.description}</h2>
                                     <span className="text-gray-300 text-sm font-semibold">Artista</span>
                                 </div>
                                 <Button variant="light" isIconOnly color="default" size="sm" radius="full" onPress={() => onClose()}>
@@ -372,6 +371,7 @@ export const PlayerDrawerProvider = memo(({ children }: { children: ReactNode })
                 </div>
             )}
             <audio ref={audioRef} preload="none" />
+            {children}
         </MusicContext.Provider>
     );
 });

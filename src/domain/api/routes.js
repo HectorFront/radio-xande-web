@@ -1,4 +1,5 @@
 export const API_ROUTES = {
     logErrors: 'log/errors',
-    music: 'post/music'
+    music: 'post/music',
+    youtube: 'youtube'
 };
