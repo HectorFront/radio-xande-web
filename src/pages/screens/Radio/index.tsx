@@ -17,7 +17,7 @@ export default function Radio() {
       .catch(console.log);
   }, []);
 
-  const ContentMusic = useMemo(() => ({ isCarousel = false }: { isCarousel?: boolean }) => {
+  const ContentMusic = useMemo(() => ({ tab, isCarousel = false }: { tab: string; isCarousel?: boolean }) => {
     const scrollRef = useRef<HTMLDivElement>(null);
     const [canScrollLeft, setCanScrollLeft] = useState(false);
     const [canScrollRight, setCanScrollRight] = useState(false);
@@ -79,7 +79,7 @@ export default function Radio() {
             >
               {musics.map((music: any, index) => (
                 <div key={music.id || `music-${index}`} className="shrink-0">
-                  <Music music={music}/>
+                  <Music tab={tab} music={music}/>
                 </div>
               ))}
             </div>
@@ -104,7 +104,7 @@ export default function Radio() {
           </div>
         ) : (
           <div className="flex flex-row flex-wrap items-center gap-5">
-            {musics.map((music: any, index) => <Music key={music.id || `music-${index}`} music={music}/>)}
+            {musics.map((music: any, index) => <Music key={music.id || `music-${index}`} tab={tab} music={music}/>)}
           </div>
         )}
       </div>
@@ -132,17 +132,17 @@ export default function Radio() {
   );
 
   return (
-      <div className="bg-neutral-900 flex-1 w-full h-full rounded-2xl pt-10 px-4 pb-4 lg:px-26">
+      <div className="bg-neutral-900 flex-1 w-full h-full rounded-2xl pt-10 px-4 pb-14 lg:px-26">
         <Tabs aria-label="Options" selectedKey={tabSelected} onSelectionChange={setTab}>
           <Tab key="all" title="Tudo">
             <div className="flex flex-col gap-10 overflow-visible">
-              <ContentMusic isCarousel={true} />
+              <ContentMusic tab="all" isCarousel={true} />
               <Divider/>
               <ContentArtist />
             </div>
           </Tab>
           <Tab key="music" title="Músicas">
-            <ContentMusic isCarousel={false} />
+            <ContentMusic tab="music" isCarousel={false} />
           </Tab>
           <Tab key="artist" title="Artistas">
             <ContentArtist />

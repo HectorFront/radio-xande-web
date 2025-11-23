@@ -1,6 +1,6 @@
 export const LiveStream = ({ videoId }: { videoId: string }) => {
     return (
-        <div className="relative aspect-video w-96 max-w-full">
+        <div className="relative aspect-video w-[480px] max-w-full">
             <iframe
                 width="100%"
                 height="100%"

@@ -58,6 +58,21 @@ export const PlayerDrawerProvider = memo(({ children }: { children: ReactNode })
 
     const STREAM_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/stream/media/${currentMusic?.filename_music}`;
 
+    const closeMusicDrawer = () => {
+        if (audioRef.current) {
+            audioRef.current.pause();
+        }
+        if (hlsRef.current) {
+            hlsRef.current.destroy();
+            hlsRef.current = null;
+        }
+        pendingSeek.current = 0;
+        setCurrentTime(0);
+        setCurrentMusic(null);
+        setCurrentPlaying(false);
+        onClose();
+    };
+
     const initializeHLS = () => {
         const audio = audioRef.current;
         if (!audio) return;
@@ -253,7 +268,14 @@ export const PlayerDrawerProvider = memo(({ children }: { children: ReactNode })
                                     <h2 className="text-sm font-bold text-white m-0 line-clamp-1">{currentMusic?.description}</h2>
                                     <span className="text-gray-300 text-sm font-semibold">Artista</span>
                                 </div>
-                                <Button variant="light" isIconOnly color="default" size="sm" radius="full" onPress={() => onClose()}>
+                                <Button 
+                                    size="sm"
+                                    isIconOnly
+                                    radius="full"
+                                    color="default"
+                                    variant="light"
+                                    onPress={closeMusicDrawer}
+                                >
                                     <Icon filled name="close" className="text-neutral-400" style={{ fontSize: 20 }} />
                                 </Button>
                             </div>

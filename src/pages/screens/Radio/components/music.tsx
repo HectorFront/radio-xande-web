@@ -5,6 +5,7 @@ import { useState, useRef, useMemo, memo, useEffect } from "react";
 import { usePlayerDrawerContext } from "@/contexts/PlayerDrawer";
 
 interface MusicProps {
+    tab: string;
     music: {
         id: string;
         duration_ms: string;
@@ -14,7 +15,7 @@ interface MusicProps {
     }
 }
 
-export const Music = memo(({ music }: MusicProps) => {
+export const Music = memo(({ tab, music }: MusicProps) => {
     const { 
         buffered,
         seekingTimeMusic,
@@ -107,10 +108,10 @@ export const Music = memo(({ music }: MusicProps) => {
         <div 
             onMouseEnter={() => setIsHovered(true)} 
             onMouseLeave={() => setIsHovered(false)}
-            className="w-[250px] h-80 flex flex-col gap-4 p-4 bg-neutral-800 rounded-xl" 
+            className={clsx("flex flex-col gap-4 p-4 bg-neutral-800 rounded-xl", { "w-full sm:w-[250px] h-96 sm:h-80": tab === "music", "w-[250px] h-80": tab === "all" })}
         >
-            <div 
-                className="w-full h-[120px] bg-neutral-700 rounded-xl relative overflow-hidden" 
+            <div
+                className={clsx("bg-neutral-700 rounded-xl relative overflow-hidden w-full", { "h-[200px] sm:h-[120px]": tab === "music", "h-[120px]": tab === "all" })}
                 style={{ 
                     backgroundImage: `linear-gradient(rgba(0, 0, 0, ${sameMusic ? 0 : 0.5}), rgba(0, 0, 0, ${sameMusic ? 0 : 0.5})), url(${IMAGE_URL})`, 
                     backgroundPosition: "100%",
