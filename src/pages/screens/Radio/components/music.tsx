@@ -1,12 +1,8 @@
 import { Icon } from "@/components/Icon";
 import { Avatar } from "@heroui/react"
 import clsx from "clsx";
-import { useState, useRef, useEffect, useMemo, memo } from "react";
-import { useMusicContext } from "@/contexts/MusicContext";
-import Hls from "hls.js";
+import { useState, useRef, useMemo, memo, useEffect } from "react";
 import { usePlayerDrawerContext } from "@/contexts/PlayerDrawer";
-import { createPortal } from "react-dom";
-import { ObservableGlobal } from "@/utils";
 
 interface MusicProps {
     music: {
@@ -19,206 +15,93 @@ interface MusicProps {
 }
 
 export const Music = memo(({ music }: MusicProps) => {
-    const { currentPlayingId, setCurrentPlaying } = useMusicContext();
-    const { changeMusicDrawer, currentMusicDrawer, isOpenPlayerDrawer, onOpenPlayerDrawer } = usePlayerDrawerContext();
-    const [currentTime, setCurrentTime] = useState(0);
-    const [duration, setDuration] = useState(0);
+    const { 
+        buffered,
+        seekingTimeMusic,
+        currentTimeMusic,
+        currentVolumeMusic,
+        loadingCurrentChunk,
+        isPlayingMusic,
+        handlePlayMusic,
+        currentMusicDrawer,
+        handleVolumeMusic,
+        handleSeekingTimeMusic
+    } = usePlayerDrawerContext();
     
     const apiDuration = parseInt(music.duration_ms) / 1000;
-    const displayDuration = duration || apiDuration;
+    const displayDuration = apiDuration;
     const [isDragging, setIsDragging] = useState(false);
     const [volume, setVolume] = useState(1);
     const [isVolumeDragging, setIsVolumeDragging] = useState(false);
-    const [buffered, setBuffered] = useState(0);
-    const [loadingCurrentChunk, setLoadingCurrentChunk] = useState(false);
     const [seekingTime, setSeekingTime] = useState<number | null>(null);
     const [isHovered, setIsHovered] = useState(false);
-    
-    const isPlaying = currentPlayingId === music.id;
-    const audioRef = useRef<HTMLAudioElement>(null);
-    const hlsRef = useRef<Hls | null>(null);
-    const animationRef = useRef<number>();
+
     const sliderRef = useRef<HTMLDivElement>(null);
     const volumeSliderRef = useRef<HTMLDivElement>(null);
 
+    const isPlaying = isPlayingMusic && currentMusicDrawer?.id === music.id;
+    const sameMusic = currentMusicDrawer?.id === music.id;
+    const _thisBuffered = sameMusic ? buffered : 0;
+    const _thisCurrenTime = sameMusic ? currentTimeMusic : 0;
+    const _thisLoadingCurrentChunk = sameMusic ? loadingCurrentChunk : false;
+
     const IMAGE_URL = `${import.meta.env.VITE_S3_REPOSITORY_PUBLIC}/${music.filename_image}`;
-    const STREAM_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/stream/media/${music.filename_music}`;
     
     const formatTime = (time: number) => {
         const minutes = Math.floor(time / 60);
         const seconds = Math.floor(time % 60);
         return `${minutes}:${seconds.toString().padStart(2, '0')}`;
     };
-    
-    const initializeHLS = () => {
-        const audio = audioRef.current;
-        if (!audio || !STREAM_BASE_URL) return;
-        
-        if (Hls.isSupported() && STREAM_BASE_URL.includes('.m3u8')) {
-            const hls = new Hls();
-            hlsRef.current = hls;
-            hls.loadSource(STREAM_BASE_URL);
-            hls.attachMedia(audio);
-            hls.on(Hls.Events.MANIFEST_PARSED, () => {
-                setLoadingCurrentChunk(false);
-                audio.play();
-            });
-            hls.on(Hls.Events.ERROR, (event, data) => {
-                console.error('HLS error:', data);
-                setLoadingCurrentChunk(false);
-            });
-        } else if (audio.canPlayType('application/vnd.apple.mpegurl')) {
-            audio.src = STREAM_BASE_URL;
-            audio.play();
+
+    const handlePlay = () => {
+        handlePlayMusic({
+            volume,
+            seekingTime,
+            music
+        })
+    };
+
+    const handleVolume = (newVolume: number) => {
+        setVolume(newVolume);
+        if (sameMusic) {
+            handleVolumeMusic(newVolume);
         }
     };
-    
-    const togglePlay = () => {
-        ObservableGlobal.notify('audioglobal-ref', audioRef.current);
-        if (audioRef.current && STREAM_BASE_URL && !loadingCurrentChunk) {
-            if (isPlaying) {
-                audioRef.current.pause();
-                setCurrentPlaying(null);
-            } else {
-                if (!hlsRef.current && !audioRef.current.src) {
-                    setLoadingCurrentChunk(true);
-                    initializeHLS();
-                } else {
-                    audioRef.current.play();
-                }
-                if (!isOpenPlayerDrawer) {
-                    onOpenPlayerDrawer(music);
-                }
-                if (isOpenPlayerDrawer && (currentMusicDrawer?.id !== music.id)) {
-                    changeMusicDrawer(music);
-                    ObservableGlobal.notify("audioglobal-seekingTime", 0);
-                    ObservableGlobal.notify("audioglobal-currentTime", 0);
-                }
-                setCurrentPlaying(music.id);
-            }
+
+    const handleSeekingTime = (newSeekingTime: number) => {
+        setSeekingTime(newSeekingTime);
+        if (sameMusic) {
+            handleSeekingTimeMusic(newSeekingTime);
         }
     };
-    
+
     useEffect(() => {
-        const audio = audioRef.current;
-        if (audio) {
-            const handleLoadedMetadata = () => {
-                ObservableGlobal.notify("audioglobal-duration", audio.duration);
-                setDuration(audio.duration);
-            }
-            const handleTimeUpdate = () => {
-                if (!isDragging) {
-                    setCurrentTime(audio.currentTime);
-                    ObservableGlobal.notify("audioglobal-currentTime", audio.currentTime);
-                }
-                if (Math.abs(audio.currentTime - seekingTime) < 1) {
-                    setSeekingTime(null);
-                    ObservableGlobal.notify("audioglobal-seekingTime", null);
-                }
-                if (audio.buffered.length > 0) {
-                    const valueBuffered = audio.buffered.end(audio.buffered.length - 1);
-                    setBuffered(valueBuffered);
-                    ObservableGlobal.notify("audioglobal-buffered", valueBuffered);
-                }
-            };
-            const handleSeeked = () => {
-                setCurrentTime(audio.currentTime);
-                setSeekingTime(null);
-                ObservableGlobal.notify("audioglobal-currentTime", audio.currentTime);
-                ObservableGlobal.notify("audioglobal-seekingTime", null);
-            };
-            const handleEnded = () => {
-                setCurrentPlaying(null);
-                setCurrentTime(0);
-                ObservableGlobal.notify("audioglobal-currentTime", 0);
-            };
-            const handleProgress = () => {
-                if (audio.buffered.length > 0) {
-                    const valueBuffered = audio.buffered.end(audio.buffered.length - 1);
-                    setBuffered(valueBuffered);
-                    ObservableGlobal.notify("audioglobal-buffered", valueBuffered);
-                }
-            };
-            const handleLoadStart = () => {
-                setLoadingCurrentChunk(true);
-                ObservableGlobal.notify("audioglobal-loadingCurrentChunk", true);
-            };
-            const handleCanPlay = () => {
-                setLoadingCurrentChunk(false);
-                ObservableGlobal.notify("audioglobal-loadingCurrentChunk", false);
-            };
-            const handleWaiting = () => {
-                setLoadingCurrentChunk(true);
-                ObservableGlobal.notify("audioglobal-loadingCurrentChunk", true);
-            };
-            const handleCanPlayThrough = () => {
-                setLoadingCurrentChunk(false);
-                ObservableGlobal.notify("audioglobal-loadingCurrentChunk", false);
-            };
-            // 
-            audio.addEventListener('loadedmetadata', handleLoadedMetadata);
-            audio.addEventListener('timeupdate', handleTimeUpdate);
-            audio.addEventListener('seeked', handleSeeked);
-            audio.addEventListener('ended', handleEnded);
-            audio.addEventListener('progress', handleProgress);
-            audio.addEventListener('loadstart', handleLoadStart);
-            audio.addEventListener('canplay', handleCanPlay);
-            audio.addEventListener('waiting', handleWaiting);
-            audio.addEventListener('canplaythrough', handleCanPlayThrough);
-            ObservableGlobal.subscribe(`audiolocal-${music.id}-volume`, setVolume);
-            ObservableGlobal.subscribe(`audiolocal-${music.id}-seekingTime`, setSeekingTime);
-            ObservableGlobal.subscribe(`audiolocal-${music.id}-isDragging`, setIsDragging);
-            ObservableGlobal.subscribe(`audiolocal-${music.id}-isVolumeDragging`, setIsVolumeDragging);
-            return () => {
-                ObservableGlobal.unsubscribe(`audiolocal-${music.id}-volume`, setVolume);
-                ObservableGlobal.unsubscribe(`audiolocal-${music.id}-seekingTime`, setSeekingTime);
-                ObservableGlobal.unsubscribe(`audiolocal-${music.id}-isDragging`, setIsDragging);
-                ObservableGlobal.unsubscribe(`audiolocal-${music.id}-isVolumeDragging`, setIsVolumeDragging);
-            };
+        if (sameMusic) {
+            setSeekingTime(seekingTimeMusic);
         }
-    }, []);
-    
+    }, [seekingTimeMusic]);
+
     useEffect(() => {
-        if (audioRef.current && !isPlaying && currentPlayingId !== music.id) {
-            audioRef.current.pause();
+        if (sameMusic) {
+            setVolume(currentVolumeMusic);
         }
-    }, [currentPlayingId, music.id, isPlaying]);
-    
-    useEffect(() => {
-        const animate = () => {
-            if (isPlaying) {
-                animationRef.current = requestAnimationFrame(animate);
-            }
-        };
-        
-        if (isPlaying) {
-            animate();
-        } else if (animationRef.current) {
-            cancelAnimationFrame(animationRef.current);
-        }
-        
-        return () => {
-            if (animationRef.current) {
-                cancelAnimationFrame(animationRef.current);
-            }
-        };
-    }, [isPlaying]);
-    
+    }, [currentVolumeMusic]);
+
     const BeatBars = useMemo(() => {
         const bars = Array.from({ length: 20 }, (_, i) => {
             const height = isPlaying ? 
-                Math.sin((currentTime * 10 + i) * 0.5) * 20 + 30 : 
+                Math.sin((_thisCurrenTime * 10 + i) * 0.5) * 20 + 30 : 
                 Math.random() * 10 + 10;
             return (
                 <div
                     key={i}
-                    className={clsx({ "bg-neutral-500": !STREAM_BASE_URL || loadingCurrentChunk, "bg-danger-500": STREAM_BASE_URL && !loadingCurrentChunk }, "flex-1 transition-all duration-75")}
+                    className={clsx({ "bg-neutral-500": _thisLoadingCurrentChunk, "bg-danger-500": !_thisLoadingCurrentChunk }, "flex-1 transition-all duration-75")}
                     style={{ height: `${Math.abs(height)}px` }}
                 />
             );
         });
         return <div className="flex items-end gap-1 w-full h-12 absolute bottom-0">{bars}</div>;
-    }, [isPlaying, STREAM_BASE_URL, currentTime, loadingCurrentChunk]);
+    }, [isPlaying, _thisCurrenTime, _thisLoadingCurrentChunk]);
 
     return (
         <div 
@@ -229,7 +112,7 @@ export const Music = memo(({ music }: MusicProps) => {
             <div 
                 className="w-full h-[120px] bg-neutral-700 rounded-xl relative overflow-hidden" 
                 style={{ 
-                    backgroundImage: `linear-gradient(rgba(0, 0, 0, ${isPlaying ? 0 : 0.5}), rgba(0, 0, 0, ${isPlaying ? 0 : 0.5})), url(${IMAGE_URL})`, 
+                    backgroundImage: `linear-gradient(rgba(0, 0, 0, ${sameMusic ? 0 : 0.5}), rgba(0, 0, 0, ${sameMusic ? 0 : 0.5})), url(${IMAGE_URL})`, 
                     backgroundPosition: "100%",
                     backgroundSize: "cover"
                 }}
@@ -240,73 +123,62 @@ export const Music = memo(({ music }: MusicProps) => {
                         <div
                             className={clsx(
                                 {
-                                    "bg-neutral-500 cursor-default": !STREAM_BASE_URL || loadingCurrentChunk,
-                                    "bg-danger-500 hover:bg-danger-300 cursor-pointer": STREAM_BASE_URL && !loadingCurrentChunk,
-                                    "opacity-0": !isHovered || !loadingCurrentChunk,
-                                    "opacity-100": isHovered || loadingCurrentChunk
+                                    "bg-neutral-500 cursor-default": _thisLoadingCurrentChunk,
+                                    "bg-danger-500 hover:bg-danger-300 cursor-pointer": !_thisLoadingCurrentChunk,
+                                    "opacity-0": !isHovered || !_thisLoadingCurrentChunk,
+                                    "opacity-100": isHovered || _thisLoadingCurrentChunk
                                 },
                                 "w-16 h-16 flex items-center justify-center shadow-xl",
                                 "rounded-full select-none transition-all duration-300 z-50"
                             )}
-                            onClick={togglePlay}
+                            onClick={handlePlay}
                         >
                             <Icon 
                                 filled
-                                spin={loadingCurrentChunk}
-                                style={{ fontSize: loadingCurrentChunk ? 35 : 50 }}
-                                name={loadingCurrentChunk ? "music_note" : isPlaying ? "pause" : "play_arrow"} 
+                                spin={_thisLoadingCurrentChunk}
+                                style={{ fontSize: _thisLoadingCurrentChunk ? 35 : 50 }}
+                                name={_thisLoadingCurrentChunk ? "music_note" : isPlaying ? "pause" : "play_arrow"} 
                             />
                         </div>
                     </div>
                 </div>
-                {BeatBars}
+                {isHovered || sameMusic ? BeatBars : null}
             </div>
-            {createPortal(
-                <audio ref={audioRef} preload="none" />,
-                document.getElementById("portal-memory-audios")
-            )}
             <div className="flex flex-col gap-2">
                 <div className="flex justify-between text-xs text-neutral-400">
-                    <span>{formatTime(currentTime)}</span>
+                    <span>{formatTime(_thisCurrenTime)}</span>
                     <span>{formatTime(displayDuration)}</span>
                 </div>
-                
                 <div className="flex items-center gap-3">
                     <div 
                         ref={sliderRef}
-                        className={clsx(STREAM_BASE_URL ? "cursor-pointer" : "cursor-default", "flex-1 relative select-none py-2")}
+                        className={clsx("cursor-pointer flex-1 relative select-none py-2")}
                         onClick={(e) => {
-                            if (!STREAM_BASE_URL) return;
-                            if (audioRef.current && !isDragging) {
+                            if (!isDragging) {
                                 const rect = e.currentTarget.getBoundingClientRect();
                                 const clickX = e.clientX - rect.left;
                                 const percentage = clickX / rect.width;
                                 
                                 const targetTime = percentage * displayDuration;
                                 setSeekingTime(targetTime);
-                                ObservableGlobal.notify("audioglobal-seekingTime", targetTime);
-                                audioRef.current.currentTime = targetTime;
+                                handleSeekingTime(targetTime);
                             }
                         }}
                         onMouseDown={(e) => {
-                            if (!STREAM_BASE_URL) return;
                             setIsDragging(true);
-                            ObservableGlobal.notify("audioglobal-isDragging", true);
                             const handleMouseMove = (e: MouseEvent) => {
-                                if (audioRef.current && sliderRef.current) {
+                                if (sliderRef.current) {
                                     const rect = sliderRef.current.getBoundingClientRect();
                                     const clickX = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
                                     const percentage = clickX / rect.width;
                                     
                                     const targetTime = percentage * displayDuration;
                                     setSeekingTime(targetTime);
-                                    ObservableGlobal.notify("audioglobal-seekingTime", targetTime);
-                                    audioRef.current.currentTime = targetTime;
+                                    handleSeekingTime(targetTime);
                                 }
                             };
                             const handleMouseUp = () => {
                                 setIsDragging(false);
-                                ObservableGlobal.notify("audioglobal-isDragging", false);
                                 document.removeEventListener('mousemove', handleMouseMove);
                                 document.removeEventListener('mouseup', handleMouseUp);
                             };
@@ -319,20 +191,22 @@ export const Music = memo(({ music }: MusicProps) => {
                             <div 
                                 className="bg-neutral-500 h-1 rounded-full absolute"
                                 style={{ 
-                                    width: `${displayDuration ? (buffered / displayDuration) * 100 : 0}%`,
+                                    maxWidth: "100%",
+                                    width: `${displayDuration ? (_thisBuffered / displayDuration) * 100 : 0}%`,
                                     transition: 'width 200ms'
                                 }}
                             />
                             {/* Progress bar */}
                             <div 
-                                className={clsx({ "bg-neutral-500": !STREAM_BASE_URL, "bg-danger-500": STREAM_BASE_URL }, "h-1 rounded-full relative")}
+                                className={clsx("bg-danger-500 h-1 rounded-full relative")}
                                 style={{ 
-                                    width: `${displayDuration ? ((seekingTime ?? currentTime) / displayDuration) * 100 : 0}%`,
+                                    maxWidth: "100%",
+                                    width: `${displayDuration ? ((seekingTime ?? _thisCurrenTime) / displayDuration) * 100 : 0}%`,
                                     transition: isDragging ? 'none' : 'all 100ms'
                                 }}
                             >
                                 <div 
-                                    className={clsx({ "bg-neutral-500 cursor-default": !STREAM_BASE_URL, "bg-danger-500 cursor-pointer": STREAM_BASE_URL }, "absolute -right-1.5 -top-1 w-3 h-3 rounded-full shadow-lg")}
+                                    className={clsx("bg-danger-500 cursor-pointer absolute -right-1.5 -top-1 w-3 h-3 rounded-full shadow-lg")}
                                 />
                             </div>
                         </div>
@@ -340,35 +214,29 @@ export const Music = memo(({ music }: MusicProps) => {
                     <Icon filled name={(volume * 100) <= 0 ? "no_sound" : "volume_up"} className="text-neutral-400" style={{ fontSize: 20 }} />
                     <div 
                         ref={volumeSliderRef}
-                        className={clsx(STREAM_BASE_URL ? "cursor-pointer": "cursor-default", "w-16 relative select-none py-2")}
+                        className={clsx("cursor-pointer w-16 relative select-none py-2")}
                         onClick={(e) => {
-                            if (!STREAM_BASE_URL) return;
                             if (!isVolumeDragging && volumeSliderRef.current) {
                                 const rect = e.currentTarget.getBoundingClientRect();
                                 const clickX = e.clientX - rect.left;
                                 const newVolume = Math.max(0, Math.min(clickX / rect.width, 1));
                                 setVolume(newVolume);
-                                audioRef.current.volume = newVolume;
-                                ObservableGlobal.notify("audioglobal-volume", newVolume);
+                                handleVolume(newVolume);
                             }
                         }}
                         onMouseDown={(e) => {
-                            if (!STREAM_BASE_URL) return;
                             setIsVolumeDragging(true);
-                            ObservableGlobal.notify("audioglobal-isVolumeDragging", true);
                             const handleMouseMove = (e: MouseEvent) => {
                                 if (volumeSliderRef.current) {
                                     const rect = volumeSliderRef.current.getBoundingClientRect();
                                     const clickX = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
                                     const newVolume = clickX / rect.width;
                                     setVolume(newVolume);
-                                    audioRef.current.volume = newVolume;
-                                    ObservableGlobal.notify("audioglobal-volume", newVolume);
+                                    handleVolume(newVolume);
                                 }
                             };
                             const handleMouseUp = () => {
                                 setIsVolumeDragging(false);
-                                ObservableGlobal.notify("audioglobal-isVolumeDragging", false);
                                 document.removeEventListener('mousemove', handleMouseMove);
                                 document.removeEventListener('mouseup', handleMouseUp);
                             };
@@ -378,18 +246,18 @@ export const Music = memo(({ music }: MusicProps) => {
                     >
                         <div className="w-full bg-neutral-600 rounded-full h-1 relative">
                             <div 
-                                className={clsx({ "bg-neutral-500": !STREAM_BASE_URL, "bg-danger-500": STREAM_BASE_URL }, "h-1 rounded-full relative")}
-                                style={{ 
+                                className={clsx("bg-danger-500 h-1 rounded-full relative")}
+                                style={{
+                                    maxWidth: "100%",
                                     width: `${volume * 100}%`,
                                     transition: isVolumeDragging ? 'none' : 'all 100ms'
                                 }}
                             >
-                                <div className={clsx({ "bg-neutral-500": !STREAM_BASE_URL, "bg-danger-500": STREAM_BASE_URL }, "absolute -right-1.5 -top-1 w-3 h-3 rounded-full shadow-lg")} />
+                                <div className={clsx("bg-danger-500 absolute -right-1.5 -top-1 w-3 h-3 rounded-full shadow-lg")} />
                             </div>
                         </div>
                     </div>
                 </div>
-                
                 <span className="font-semibold text-lg text-wrap line-clamp-2">{music.description}</span>
                 <div className="flex flex-row gap-3 items-center">
                     <Avatar 

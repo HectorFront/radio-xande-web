@@ -4,11 +4,10 @@ import { Divider, Input, Tab, Tabs } from "@heroui/react";
 import { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import { Icon } from "@/components/Icon";
 import { ModelMusics } from "./model";
-import { MusicProvider } from "@/contexts/MusicContext";
 
 const TABS = ["all", "music", "artist"];
 
-export default function Home() {
+export default function Radio() {
   const [tabSelected, setTab] = useState(TABS[0]);
   const [musics, setMusics] = useState([]);
 
@@ -133,7 +132,6 @@ export default function Home() {
   );
 
   return (
-    <MusicProvider>
       <div className="bg-neutral-900 flex-1 w-full h-full rounded-2xl pt-10 px-4 pb-4 lg:px-26">
         <Tabs aria-label="Options" selectedKey={tabSelected} onSelectionChange={setTab}>
           <Tab key="all" title="Tudo">
@@ -151,6 +149,5 @@ export default function Home() {
           </Tab>
         </Tabs>
       </div>
-    </MusicProvider>
   );
 }

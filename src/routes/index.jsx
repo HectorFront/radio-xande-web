@@ -44,25 +44,27 @@ export const AppRoutes = () => {
         setNotificationApp({ notify, dismissNotification });
     },[]);
     return (
-        <HashRouter>
-            <SwitchRoutes>
-                {loadingAuth
-                    ?
-                    <Fallback/>
-                    :
-                    <>
-                        <RenderRoutes
-                            authenticated={false}
-                            routes={PUBLIC_ROUTES}
-                        />
-                        <NotificationsSystem
-                            theme={bootstrapTheme}
-                            notifications={notifications}
-                            dismissNotification={(id) => dismissNotification(id)}
-                        />
-                    </>
-                }
-            </SwitchRoutes>
-        </HashRouter>
+        <>
+            <HashRouter>
+                <SwitchRoutes>
+                    {loadingAuth
+                        ?
+                        <Fallback/>
+                        :
+                        <>
+                            <RenderRoutes
+                                authenticated={false}
+                                routes={PUBLIC_ROUTES}
+                            />
+                            <NotificationsSystem
+                                theme={bootstrapTheme}
+                                notifications={notifications}
+                                dismissNotification={(id) => dismissNotification(id)}
+                            />
+                        </>
+                    }
+                </SwitchRoutes>
+            </HashRouter>
+        </>
     )
 }

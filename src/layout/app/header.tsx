@@ -11,7 +11,7 @@ import {
   Button,
 } from "@heroui/react";
 import Lottie from 'react-lottie';
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import SpongebobJSON from '@/assets/spongebob.json';
 import { CLIENT_ROUTES } from "@/domain/client/routes";
 import clsx from "clsx";
@@ -26,13 +26,15 @@ export const defaultOptionsLottie = {
 
 export default function Header() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
 
   const menuItems = [
     { text: "Rádio", path: CLIENT_ROUTES.Radio },
     { text: "Vídeos", path: CLIENT_ROUTES.Xanvideos },
     { text: "Democracia da Live", path: CLIENT_ROUTES.Links },
-    { text: "Postagens da comunidade", path: CLIENT_ROUTES.Community },
+    { text: "Chat comunidade", path: CLIENT_ROUTES.Community },
+    { text: "Quem fez?", path: '' },
   ];
 
   return (
@@ -83,23 +85,28 @@ export default function Header() {
           <p className="font-bold text-inherit text-xl">StompeBob Mix</p>
         </NavbarBrand>
         <NavbarItem isActive={location.pathname === CLIENT_ROUTES.Radio}>
-          <Link color={"foreground"} href="#">
+          <Link className="cursor-pointer hover:opacity-80" color={"foreground"} onClick={() => navigate(CLIENT_ROUTES.Radio)}>
             Rádio
           </Link>
         </NavbarItem>
         <NavbarItem isActive={location.pathname === CLIENT_ROUTES.Xanvideos}>
-          <Link color="foreground" href="#">
+          <Link className="cursor-pointer hover:opacity-80" color="foreground" onClick={() => navigate(CLIENT_ROUTES.Xanvideos)}>
             Vídeos
           </Link>
         </NavbarItem>
-        <NavbarItem isActive={location.pathname === CLIENT_ROUTES.Xanvideos}>
-          <Link color="foreground" href="#">
+        <NavbarItem isActive={location.pathname === CLIENT_ROUTES.Links}>
+          <Link className="cursor-pointer hover:opacity-80" color="foreground">
             Democracia da Live
           </Link>
         </NavbarItem>
         <NavbarItem isActive={location.pathname === CLIENT_ROUTES.Community}>
-          <Link color="foreground" href="#">
-            Postagens da comunidade
+          <Link className="cursor-pointer hover:opacity-80" color="foreground">
+            Chat comunidade
+          </Link>
+        </NavbarItem>
+        <NavbarItem isActive={location.pathname === CLIENT_ROUTES.Community}>
+          <Link className="cursor-pointer hover:opacity-80" color="foreground">
+            Quem fez?
           </Link>
         </NavbarItem>
       </NavbarContent>
@@ -117,10 +124,9 @@ export default function Header() {
         {menuItems.map(({ text, path }, index) => (
           <NavbarMenuItem key={`link-${index}`}>
             <Link
-              className="w-full"
-              color={"foreground"}
-              href="#"
               size="lg"
+              color="foreground"
+              className="w-full cursor-pointer hover:opacity-80"
             >
               <span className={clsx({ "border-b-4 border-b-red-400 font-bold": location.pathname === path })} dangerouslySetInnerHTML={{ __html: text }}/>
             </Link>
