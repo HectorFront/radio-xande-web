@@ -1,4 +1,4 @@
-import { createContext, useContext, ReactNode } from 'react';
+import { createContext, useContext, ReactNode, useState, useRef, MutableRefObject, useEffect } from 'react';
 import PlayerDrawer from '@/components/PlayerDrawer';
 import { useDisclosure } from "@heroui/react";
 
@@ -12,6 +12,8 @@ type MusicProps = {
 
 interface MusicContextType {
     isOpenPlayerDrawer: boolean;
+    currentMusicDrawer: MusicProps;
+    changeMusicDrawer: (music: MusicProps) => void;
     onOpenPlayerDrawer: (music: MusicProps) => void;
 }
 
@@ -19,15 +21,33 @@ const MusicContext = createContext<MusicContextType | undefined>(undefined);
 
 export const PlayerDrawerProvider = ({ children }: { children: ReactNode }) => {
     const { isOpen, onOpenChange } = useDisclosure();
+    const [currentMusic, setCurrentMusic] = useState<MusicProps | null>(null);
 
     const onOpenPlayerDrawer = (music: MusicProps) => {
+        if (music) {
+            setCurrentMusic(music);
+        }
         onOpenChange();
     };
 
+    const changeMusic = (music: MusicProps) => {
+        setCurrentMusic(music);
+    }
+
     return (
-        <MusicContext.Provider value={{ isOpenPlayerDrawer: isOpen, onOpenPlayerDrawer }}>
+        <MusicContext.Provider value={{ 
+            onOpenPlayerDrawer,
+            isOpenPlayerDrawer: isOpen,
+            changeMusicDrawer: changeMusic,
+            currentMusicDrawer: currentMusic
+        }}>
             {children}
-            {isOpen && <PlayerDrawer isOpen={isOpen} onOpenChange={onOpenChange} />}
+            <PlayerDrawer 
+                isOpen={isOpen}
+                currentMusic={currentMusic}
+                onOpenChange={onOpenChange}
+            />
+            <div id='portal-memory-audios'/>
         </MusicContext.Provider>
     );
 };

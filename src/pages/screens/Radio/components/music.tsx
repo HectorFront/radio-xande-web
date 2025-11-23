@@ -1,10 +1,12 @@
 import { Icon } from "@/components/Icon";
 import { Avatar } from "@heroui/react"
 import clsx from "clsx";
-import { useState, useRef, useEffect, useMemo } from "react";
+import { useState, useRef, useEffect, useMemo, memo } from "react";
 import { useMusicContext } from "@/contexts/MusicContext";
 import Hls from "hls.js";
 import { usePlayerDrawerContext } from "@/contexts/PlayerDrawer";
+import { createPortal } from "react-dom";
+import { ObservableGlobal } from "@/utils";
 
 interface MusicProps {
     music: {
@@ -16,9 +18,9 @@ interface MusicProps {
     }
 }
 
-export const Music = ({ music }: MusicProps) => {
+export const Music = memo(({ music }: MusicProps) => {
     const { currentPlayingId, setCurrentPlaying } = useMusicContext();
-    const { isOpenPlayerDrawer, onOpenPlayerDrawer } = usePlayerDrawerContext();
+    const { changeMusicDrawer, currentMusicDrawer, isOpenPlayerDrawer, onOpenPlayerDrawer } = usePlayerDrawerContext();
     const [currentTime, setCurrentTime] = useState(0);
     const [duration, setDuration] = useState(0);
     
@@ -72,6 +74,7 @@ export const Music = ({ music }: MusicProps) => {
     };
     
     const togglePlay = () => {
+        ObservableGlobal.notify('audioglobal-ref', audioRef.current);
         if (audioRef.current && STREAM_BASE_URL && !loadingCurrentChunk) {
             if (isPlaying) {
                 audioRef.current.pause();
@@ -86,62 +89,91 @@ export const Music = ({ music }: MusicProps) => {
                 if (!isOpenPlayerDrawer) {
                     onOpenPlayerDrawer(music);
                 }
+                if (isOpenPlayerDrawer && (currentMusicDrawer?.id !== music.id)) {
+                    changeMusicDrawer(music);
+                    ObservableGlobal.notify("audioglobal-seekingTime", 0);
+                    ObservableGlobal.notify("audioglobal-currentTime", 0);
+                }
                 setCurrentPlaying(music.id);
             }
         }
     };
     
     useEffect(() => {
-        if (audioRef.current) {
-            audioRef.current.volume = volume;
-        }
-    }, [volume]);
-    
-    useEffect(() => {
         const audio = audioRef.current;
         if (audio) {
-            const handleLoadedMetadata = () => setDuration(audio.duration);
+            const handleLoadedMetadata = () => {
+                ObservableGlobal.notify("audioglobal-duration", audio.duration);
+                setDuration(audio.duration);
+            }
             const handleTimeUpdate = () => {
-                setCurrentTime(audio.currentTime);
-                if (seekingTime !== null && Math.abs(audio.currentTime - seekingTime) < 1) {
+                if (!isDragging) {
+                    setCurrentTime(audio.currentTime);
+                    ObservableGlobal.notify("audioglobal-currentTime", audio.currentTime);
+                }
+                if (Math.abs(audio.currentTime - seekingTime) < 1) {
                     setSeekingTime(null);
+                    ObservableGlobal.notify("audioglobal-seekingTime", null);
                 }
                 if (audio.buffered.length > 0) {
-                    setBuffered(audio.buffered.end(audio.buffered.length - 1));
+                    const valueBuffered = audio.buffered.end(audio.buffered.length - 1);
+                    setBuffered(valueBuffered);
+                    ObservableGlobal.notify("audioglobal-buffered", valueBuffered);
                 }
+            };
+            const handleSeeked = () => {
+                setCurrentTime(audio.currentTime);
+                setSeekingTime(null);
+                ObservableGlobal.notify("audioglobal-currentTime", audio.currentTime);
+                ObservableGlobal.notify("audioglobal-seekingTime", null);
             };
             const handleEnded = () => {
                 setCurrentPlaying(null);
                 setCurrentTime(0);
+                ObservableGlobal.notify("audioglobal-currentTime", 0);
             };
             const handleProgress = () => {
                 if (audio.buffered.length > 0) {
-                    setBuffered(audio.buffered.end(audio.buffered.length - 1));
+                    const valueBuffered = audio.buffered.end(audio.buffered.length - 1);
+                    setBuffered(valueBuffered);
+                    ObservableGlobal.notify("audioglobal-buffered", valueBuffered);
                 }
             };
-            const handleLoadStart = () => setLoadingCurrentChunk(true);
-            const handleCanPlay = () => setLoadingCurrentChunk(false);
-            const handleWaiting = () => setLoadingCurrentChunk(true);
-            const handleCanPlayThrough = () => setLoadingCurrentChunk(false);
-            
+            const handleLoadStart = () => {
+                setLoadingCurrentChunk(true);
+                ObservableGlobal.notify("audioglobal-loadingCurrentChunk", true);
+            };
+            const handleCanPlay = () => {
+                setLoadingCurrentChunk(false);
+                ObservableGlobal.notify("audioglobal-loadingCurrentChunk", false);
+            };
+            const handleWaiting = () => {
+                setLoadingCurrentChunk(true);
+                ObservableGlobal.notify("audioglobal-loadingCurrentChunk", true);
+            };
+            const handleCanPlayThrough = () => {
+                setLoadingCurrentChunk(false);
+                ObservableGlobal.notify("audioglobal-loadingCurrentChunk", false);
+            };
+            // 
             audio.addEventListener('loadedmetadata', handleLoadedMetadata);
             audio.addEventListener('timeupdate', handleTimeUpdate);
+            audio.addEventListener('seeked', handleSeeked);
             audio.addEventListener('ended', handleEnded);
             audio.addEventListener('progress', handleProgress);
             audio.addEventListener('loadstart', handleLoadStart);
             audio.addEventListener('canplay', handleCanPlay);
             audio.addEventListener('waiting', handleWaiting);
             audio.addEventListener('canplaythrough', handleCanPlayThrough);
-            
+            ObservableGlobal.subscribe(`audiolocal-${music.id}-volume`, setVolume);
+            ObservableGlobal.subscribe(`audiolocal-${music.id}-seekingTime`, setSeekingTime);
+            ObservableGlobal.subscribe(`audiolocal-${music.id}-isDragging`, setIsDragging);
+            ObservableGlobal.subscribe(`audiolocal-${music.id}-isVolumeDragging`, setIsVolumeDragging);
             return () => {
-                audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
-                audio.removeEventListener('timeupdate', handleTimeUpdate);
-                audio.removeEventListener('ended', handleEnded);
-                audio.removeEventListener('progress', handleProgress);
-                audio.removeEventListener('loadstart', handleLoadStart);
-                audio.removeEventListener('canplay', handleCanPlay);
-                audio.removeEventListener('waiting', handleWaiting);
-                audio.removeEventListener('canplaythrough', handleCanPlayThrough);
+                ObservableGlobal.unsubscribe(`audiolocal-${music.id}-volume`, setVolume);
+                ObservableGlobal.unsubscribe(`audiolocal-${music.id}-seekingTime`, setSeekingTime);
+                ObservableGlobal.unsubscribe(`audiolocal-${music.id}-isDragging`, setIsDragging);
+                ObservableGlobal.unsubscribe(`audiolocal-${music.id}-isVolumeDragging`, setIsVolumeDragging);
             };
         }
     }, []);
@@ -202,31 +234,37 @@ export const Music = ({ music }: MusicProps) => {
                     backgroundSize: "cover"
                 }}
             >
-                <div className="absolute inset-0 flex items-center justify-center">
-                    <div
-                        className={clsx(
-                            {
-                                "bg-neutral-500 cursor-default": !STREAM_BASE_URL || loadingCurrentChunk,
-                                "bg-danger-500 hover:bg-danger-300 cursor-pointer": STREAM_BASE_URL && !loadingCurrentChunk,
-                                "opacity-0": !isHovered || !loadingCurrentChunk,
-                                "opacity-100": isHovered || loadingCurrentChunk
-                            },
-                            "w-16 h-16 flex items-center justify-center shadow-xl",
-                            "rounded-full select-none transition-all duration-300 z-50"
-                        )}
-                        onClick={togglePlay}
-                    >
-                        <Icon 
-                            filled
-                            spin={loadingCurrentChunk}
-                            style={{ fontSize: loadingCurrentChunk ? 35 : 50 }}
-                            name={loadingCurrentChunk ? "music_note" : isPlaying ? "pause" : "play_arrow"} 
-                        />
+                <div className="absolute inset-0">
+                    <div className="w-full h-full flex items-center justify-center relative">
+                        {!music?.filename_image && <Icon name="album" className="text-neutral-600 absolute" style={{ fontSize: 90 }} filled/>}
+                        <div
+                            className={clsx(
+                                {
+                                    "bg-neutral-500 cursor-default": !STREAM_BASE_URL || loadingCurrentChunk,
+                                    "bg-danger-500 hover:bg-danger-300 cursor-pointer": STREAM_BASE_URL && !loadingCurrentChunk,
+                                    "opacity-0": !isHovered || !loadingCurrentChunk,
+                                    "opacity-100": isHovered || loadingCurrentChunk
+                                },
+                                "w-16 h-16 flex items-center justify-center shadow-xl",
+                                "rounded-full select-none transition-all duration-300 z-50"
+                            )}
+                            onClick={togglePlay}
+                        >
+                            <Icon 
+                                filled
+                                spin={loadingCurrentChunk}
+                                style={{ fontSize: loadingCurrentChunk ? 35 : 50 }}
+                                name={loadingCurrentChunk ? "music_note" : isPlaying ? "pause" : "play_arrow"} 
+                            />
+                        </div>
                     </div>
                 </div>
                 {BeatBars}
             </div>
-            <audio ref={audioRef} preload="none" />
+            {createPortal(
+                <audio ref={audioRef} preload="none" />,
+                document.getElementById("portal-memory-audios")
+            )}
             <div className="flex flex-col gap-2">
                 <div className="flex justify-between text-xs text-neutral-400">
                     <span>{formatTime(currentTime)}</span>
@@ -246,12 +284,14 @@ export const Music = ({ music }: MusicProps) => {
                                 
                                 const targetTime = percentage * displayDuration;
                                 setSeekingTime(targetTime);
+                                ObservableGlobal.notify("audioglobal-seekingTime", targetTime);
                                 audioRef.current.currentTime = targetTime;
                             }
                         }}
                         onMouseDown={(e) => {
                             if (!STREAM_BASE_URL) return;
                             setIsDragging(true);
+                            ObservableGlobal.notify("audioglobal-isDragging", true);
                             const handleMouseMove = (e: MouseEvent) => {
                                 if (audioRef.current && sliderRef.current) {
                                     const rect = sliderRef.current.getBoundingClientRect();
@@ -260,11 +300,13 @@ export const Music = ({ music }: MusicProps) => {
                                     
                                     const targetTime = percentage * displayDuration;
                                     setSeekingTime(targetTime);
+                                    ObservableGlobal.notify("audioglobal-seekingTime", targetTime);
                                     audioRef.current.currentTime = targetTime;
                                 }
                             };
                             const handleMouseUp = () => {
                                 setIsDragging(false);
+                                ObservableGlobal.notify("audioglobal-isDragging", false);
                                 document.removeEventListener('mousemove', handleMouseMove);
                                 document.removeEventListener('mouseup', handleMouseUp);
                             };
@@ -306,21 +348,27 @@ export const Music = ({ music }: MusicProps) => {
                                 const clickX = e.clientX - rect.left;
                                 const newVolume = Math.max(0, Math.min(clickX / rect.width, 1));
                                 setVolume(newVolume);
+                                audioRef.current.volume = newVolume;
+                                ObservableGlobal.notify("audioglobal-volume", newVolume);
                             }
                         }}
                         onMouseDown={(e) => {
                             if (!STREAM_BASE_URL) return;
                             setIsVolumeDragging(true);
+                            ObservableGlobal.notify("audioglobal-isVolumeDragging", true);
                             const handleMouseMove = (e: MouseEvent) => {
                                 if (volumeSliderRef.current) {
                                     const rect = volumeSliderRef.current.getBoundingClientRect();
                                     const clickX = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
                                     const newVolume = clickX / rect.width;
                                     setVolume(newVolume);
+                                    audioRef.current.volume = newVolume;
+                                    ObservableGlobal.notify("audioglobal-volume", newVolume);
                                 }
                             };
                             const handleMouseUp = () => {
                                 setIsVolumeDragging(false);
+                                ObservableGlobal.notify("audioglobal-isVolumeDragging", false);
                                 document.removeEventListener('mousemove', handleMouseMove);
                                 document.removeEventListener('mouseup', handleMouseUp);
                             };
@@ -359,4 +407,4 @@ export const Music = ({ music }: MusicProps) => {
             </div>
         </div>
     );
-}
+});
