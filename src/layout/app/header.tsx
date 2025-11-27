@@ -17,6 +17,7 @@ import SpongebobJSON from '@/assets/spongebob.json';
 import { CLIENT_ROUTES } from "@/domain/client/routes";
 import clsx from "clsx";
 import { ModalLogin } from "@/components";
+import { ModalRegister } from "@/components/ModalRegister";
 
 export const defaultOptionsLottie = {
   loop: true,
@@ -29,14 +30,16 @@ export const defaultOptionsLottie = {
 export default function Header() {
   const location = useLocation();
   const navigate = useNavigate();
-  const [modalLoginOpen, setModalLoginOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [modalLoginOpen, setModalLoginOpen] = useState(false);
+  const [modalRegisterOpen, setModalRegisterOpen] = useState(false);
 
   const menuItems = [
     { text: "Rádio", path: CLIENT_ROUTES.Radio },
     { text: "Vídeos", path: CLIENT_ROUTES.Xanvideos },
     { text: "Democracia da Live", path: CLIENT_ROUTES.Links },
     { text: "Comunidade", path: CLIENT_ROUTES.Community },
+    { text: "Vaquinhas ❤️‍🩹", path: CLIENT_ROUTES.Donations },
     { text: "Assinaturas", path: CLIENT_ROUTES.Subscriptions },
   ];
 
@@ -45,6 +48,10 @@ export default function Header() {
       <ModalLogin 
         open={modalLoginOpen}
         onClose={() => setModalLoginOpen(false)}
+      />
+      <ModalRegister
+        open={modalRegisterOpen}
+        onClose={() => setModalRegisterOpen(false)}
       />
       <Navbar
         isBordered
@@ -118,8 +125,13 @@ export default function Header() {
               Comunidade
             </Link>
           </NavbarItem>
-          <NavbarItem isActive={location.pathname === CLIENT_ROUTES.Subscriptions}>
+          <NavbarItem isActive={location.pathname === CLIENT_ROUTES.Donations}>
             <Link className="cursor-pointer hover:opacity-80" color="foreground">
+              Vaquinhas ❤️‍🩹
+            </Link>
+          </NavbarItem>
+          <NavbarItem isActive={location.pathname === CLIENT_ROUTES.Subscriptions}>
+            <Link className="cursor-pointer hover:opacity-80" color="foreground" onClick={() => navigate(CLIENT_ROUTES.Subscriptions)}>
               Assinaturas
             </Link>
           </NavbarItem>
@@ -129,7 +141,7 @@ export default function Header() {
             <Link onPress={() => setModalLoginOpen(true)} color="foreground" className="cursor-pointer">Login</Link>
           </NavbarItem>
           <NavbarItem>
-            <Button as={Link} color="danger" variant="flat">
+            <Button onPress={() => setModalRegisterOpen(true)} as={Link} color="danger" variant="flat">
               Criar conta
             </Button>
           </NavbarItem>

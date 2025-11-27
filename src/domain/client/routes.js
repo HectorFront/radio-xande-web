@@ -3,5 +3,6 @@ export const CLIENT_ROUTES = {
     Xanvideos: '/xanvideos',
     Links: '/links',
     Community: '/community',
+    Donations: '/donations',
     Subscriptions: "/subscriptions",
 };

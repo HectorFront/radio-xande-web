@@ -38,8 +38,8 @@ export const ModalLogin = ({ open, onClose: onCloseProp }: ModalLoginProps) => {
     };
 
     return (
-        <Modal backdrop="blur" size="xl" isOpen={isOpen} placement="top-center" onOpenChange={onCloseModal}>
-            <ModalContent>
+        <Modal backdrop="blur" size="xl" isOpen={isOpen} placement="center" onOpenChange={onCloseModal}>
+            <ModalContent className="py-5">
                 <ModalHeader className="flex flex-col gap-5">
                     <h1 className="text-2xl font-bold text-center">Entre na sua conta</h1>                    
                     <div className="w-full flex flex-row items-center justify-center flex-wrap gap-5">
