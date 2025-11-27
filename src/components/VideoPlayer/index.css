@@ -1,7 +1,3 @@
-.vjs-big-play-button {
-    display: none !important;
-}
-
 .vjs-live-display {
     display: none !important;
 }
@@ -40,13 +36,18 @@
     background-color: rgba(129, 129, 129, 0.205) !important;
 }
 
-.vjs-fullscreen-control {
-    display: none !important;
-}
-
 .vjs-theme-fantasy {
     --vjs-theme-fantasy--primary: #d5d5d5 !important;
     --vjs-theme-fantasy--secondary: #fff !important;
+}
+
+.vjs-play-progress {
+    background-color: #f54180 !important;
+}
+
+.vjs-play-progress::before {
+    border-color: #f54180 !important;
+    background-color: #f54180 !important;
 }
 
 .vjs-tech {
@@ -58,7 +59,7 @@
 }
 
 .vjs-control-bar {
-    z-index: 100;
+    z-index: 45;
     display: flex;
     align-items: center !important;
     border-bottom-left-radius: 15px;
@@ -93,8 +94,8 @@
     line-height: 3.7 !important;
 }
 
-.vjs-theme-fantasy .vjs-play-control .vjs-icon-placeholder:before {
-    border-color: transparent !important;
+.vjs-button {
+    cursor: pointer;
 }
 
 .rounded-player {

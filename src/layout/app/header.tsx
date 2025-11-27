@@ -88,7 +88,6 @@ export default function Header() {
             />
             <div className="flex flex-row items-center gap-2">
               <p className="font-bold text-inherit text-xs sm:text-lg">StompeBob MIX</p>
-              <Chip color="primary" size="sm">Beta</Chip>
             </div>
           </NavbarBrand>
         </NavbarContent>
@@ -102,46 +101,45 @@ export default function Header() {
             />
             <div className="flex flex-row items-center gap-2">
               <p className="font-bold text-inherit text-xl">StompeBob MIX</p>
-              <Chip color="primary" size="sm">Beta</Chip>
             </div>
           </NavbarBrand>
           <NavbarItem isActive={location.pathname === CLIENT_ROUTES.Radio}>
-            <Link className="cursor-pointer hover:opacity-80" color={"foreground"} onClick={() => navigate(CLIENT_ROUTES.Radio)}>
+            <Link className="font-semibold cursor-pointer hover:opacity-80" color={"foreground"} onClick={() => navigate(CLIENT_ROUTES.Radio)}>
               Rádio
             </Link>
           </NavbarItem>
           <NavbarItem isActive={location.pathname === CLIENT_ROUTES.Xanvideos}>
-            <Link className="cursor-pointer hover:opacity-80" color="foreground" onClick={() => navigate(CLIENT_ROUTES.Xanvideos)}>
+            <Link className="font-semibold cursor-pointer hover:opacity-80" color="foreground" onClick={() => navigate(CLIENT_ROUTES.Xanvideos)}>
               Vídeos
             </Link>
           </NavbarItem>
           <NavbarItem isActive={location.pathname === CLIENT_ROUTES.Links}>
-            <Link className="cursor-pointer hover:opacity-80" color="foreground">
+            <Link className="font-semibold cursor-pointer hover:opacity-80" color="foreground" onClick={() => navigate(CLIENT_ROUTES.Links)}>
               Democracia da Live
             </Link>
           </NavbarItem>
           <NavbarItem isActive={location.pathname === CLIENT_ROUTES.Community}>
-            <Link className="cursor-pointer hover:opacity-80" color="foreground">
+            <Link className="font-semibold cursor-pointer hover:opacity-80" color="foreground" onClick={() => navigate(CLIENT_ROUTES.Community)}>
               Comunidade
             </Link>
           </NavbarItem>
           <NavbarItem isActive={location.pathname === CLIENT_ROUTES.Donations}>
-            <Link className="cursor-pointer hover:opacity-80" color="foreground">
+            <Link className="font-semibold cursor-pointer hover:opacity-80" color="foreground" onClick={() => navigate(CLIENT_ROUTES.Donations)}>
               Vaquinhas ❤️‍🩹
             </Link>
           </NavbarItem>
           <NavbarItem isActive={location.pathname === CLIENT_ROUTES.Subscriptions}>
-            <Link className="cursor-pointer hover:opacity-80" color="foreground" onClick={() => navigate(CLIENT_ROUTES.Subscriptions)}>
+            <Link className="font-semibold cursor-pointer hover:opacity-80" color="foreground" onClick={() => navigate(CLIENT_ROUTES.Subscriptions)}>
               Assinaturas
             </Link>
           </NavbarItem>
         </NavbarContent>
         <NavbarContent justify="end">
           <NavbarItem>
-            <Link onPress={() => setModalLoginOpen(true)} color="foreground" className="cursor-pointer">Login</Link>
+            <Link onPress={() => setModalLoginOpen(true)} color="foreground" className="cursor-pointer font-semibold">Login</Link>
           </NavbarItem>
           <NavbarItem>
-            <Button onPress={() => setModalRegisterOpen(true)} as={Link} color="danger" variant="flat">
+            <Button className="font-semibold" onPress={() => setModalRegisterOpen(true)} as={Link} color="danger" variant="flat">
               Criar conta
             </Button>
           </NavbarItem>
@@ -152,9 +150,10 @@ export default function Header() {
               <Link
                 size="lg"
                 color="foreground"
+                onClick={() => navigate(path)}
                 className="w-full cursor-pointer hover:opacity-80"
               >
-                <span className={clsx({ "border-b-4 border-b-red-400 font-bold": location.pathname === path })} dangerouslySetInnerHTML={{ __html: text }} />
+                <span className={clsx({ "border-b-4 border-b-red-400 font-semibold": location.pathname === path })} dangerouslySetInnerHTML={{ __html: text }} />
               </Link>
             </NavbarMenuItem>
           ))}

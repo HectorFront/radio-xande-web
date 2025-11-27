@@ -1,7 +1,7 @@
 import {ConstructorRequest} from '@/http/request';
 import {API_ROUTES} from '@/domain/api/routes';
 
-export class RequestYouTubeStreamGetUnique extends ConstructorRequest {
+export class RequestYouTubeStreamGetStatus extends ConstructorRequest {
 
     constructor() {
         const url = `${API_ROUTES.youtube}/live/superxandao`;

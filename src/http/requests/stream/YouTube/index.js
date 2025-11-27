@@ -1,1 +1,1 @@
-export * from './GET/unique';
+export * from './GET';

@@ -25,8 +25,8 @@ const FEATURES_SUBSCRIPTION = [
     "Publicar músicas de até 14MB",
     "Publicar vídeos de até 114MB",
     "Manter fixado sugestão para a Democracia da Live",
-    "Também ajuda o SamSepiolDEV manter a plataforma online para todos",
-    "Após 3 meses de assinatura, envie 5 gifs customizados e ganhe uma conta Premium no app Me..."
+    "Também ajuda o Xandão e SamSepiolDEV manter a plataforma online para todos",
+    "Após 3 meses de assinatura, envie 5 gifs customizados e ganhe uma conta Premium no app Mexpenses"
 ];
 
 export default function Subscriptions() {

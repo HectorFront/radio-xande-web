@@ -3,7 +3,7 @@ import { Icon, Render } from "@/components";
 import { Button } from "@heroui/react";
 import clsx from "clsx";
 
-export const StreamStatus = ({ videoId = '', title = '', online = false }: { videoId: string; title: string; online: boolean }) => {
+export const StreamStatusYT = ({ videoId = '', title = '', online = false }: { videoId: string; title: string; online: boolean }) => {
     return (
         <div className="flex bg-neutral-900 flex-col gap-4 py-7 px-8 left-5 bottom-7 rounded-xl w-[450px] max-w-full">
             <div className="flex flex-row items-center gap-4">
@@ -15,7 +15,7 @@ export const StreamStatus = ({ videoId = '', title = '', online = false }: { vid
                 </div>
                 <span className="font-bold flex flex-row items-center gap-2 text-sm sm:text-lg">
                     Xandinho está {online ? "online": "offline"}
-                    <img src={IconYouTube} width={20} alt="YouTube"/>
+                    <img src={IconYouTube} width={25} alt="YouTube"/>
                 </span>
             </div>
             <Render test={title}>

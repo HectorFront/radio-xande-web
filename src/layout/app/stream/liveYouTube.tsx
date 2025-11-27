@@ -1,4 +1,4 @@
-export const LiveStream = ({ videoId }: { videoId: string }) => {
+export const LiveStreamYouTube = ({ videoId }: { videoId: string }) => {
     return (
         <div className="relative aspect-video w-[480px] max-w-full">
             <iframe

@@ -58,7 +58,7 @@ export default function Radio() {
             radius="lg"
             isClearable
             className="max-w-[500px]"
-            placeholder="Pesquisar Músicas"
+            placeholder="Buscar Músicas"
             startContent={
               <Icon name="search" style={{ fontSize: 22 }} />
             }
@@ -119,7 +119,7 @@ export default function Radio() {
           radius="lg"
           isClearable
           className="max-w-[500px]"
-          placeholder="Pesquisar Artistas"
+          placeholder="Buscar Artistas"
           startContent={
             <Icon name="search" style={{ fontSize: 22 }} />
           }

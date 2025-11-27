@@ -1,5 +1,5 @@
 import { AsyncStorage } from "@/utils";
-import { createContext, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 
 interface UserProps {
     name?: string | null;
@@ -62,7 +62,7 @@ interface ContextProps {
     logoutUser: () => void;
 }
 
-const Context = createContext<ContextProps>({
+export const ContextAuthentication = createContext<ContextProps>({
     user: INITIAL_STATE_USER,
     authentication: INITIAL_STATE_AUTHENTICATION,
     authenticated: false,
@@ -119,9 +119,13 @@ export const AuthenticationProvider = ({ children }) => {
         setAuthentication(INITIAL_STATE_AUTHENTICATION);
         AsyncStorage.clear();
     };
+
+    useEffect(() => {
+        console.log(authentication);
+    }, [authentication]);
     
     return (
-        <Context.Provider value={{
+        <ContextAuthentication.Provider value={{
             user,
             authentication,
             authenticated,
@@ -132,6 +136,6 @@ export const AuthenticationProvider = ({ children }) => {
             logoutUser
         }}>
             {children}
-        </Context.Provider>
+        </ContextAuthentication.Provider>
     );
 }

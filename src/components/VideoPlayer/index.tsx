@@ -31,7 +31,6 @@ interface VideoPlayerProps extends VideoHTMLAttributes<HTMLVideoElement> {
     srcWaterMark?: string;
     classNameVideo?: string;
     classNameContainer?: string;
-    classNameFullscreen?: string;
     positionWaterMark?: "top_left" | "top_right" | "bottom_left" | "bottom_right";
     styleVideo?: StyleHTMLAttributes<HTMLVideoElement>;
     styleContainer?: StyleHTMLAttributes<HTMLDivElement>;
@@ -76,7 +75,6 @@ interface VideoPlayerProps extends VideoHTMLAttributes<HTMLVideoElement> {
     onNextSeconds?: (event) => void;
     onScreenshot?: (event) => void;
     onClickToLive?: (event) => void;
-    onToggleFullscreen?: (event) => void;
     backSeconds?: boolean;
     nextSeconds?: boolean;
     onTimeUpdateEvent?: (event) => void;
@@ -103,7 +101,6 @@ interface VideoPlayerProps extends VideoHTMLAttributes<HTMLVideoElement> {
     }[];
     controlBar?: {
         zoom?: boolean;
-        fullscreen?: boolean;
         screenshot?: boolean;
         playToggle?: boolean;
         skipBackward?: boolean;
@@ -174,12 +171,11 @@ function reducerState(state: StateProps, action: ActionState): any {
     throw Error('Unknown action.');
 }
 
-const CUSTOM_CONTROL_BAR = ['zoom', 'screenshot', 'fullscreen', 'navigateLive'];
+const CUSTOM_CONTROL_BAR = ['zoom', 'screenshot', 'navigateLive'];
 const CSS_NAMESPACES_VIDEOJS = {
     play: 'vjs-play-control',
     ambilight: 'vjs-ambilight',
     screenshot: 'vjs-screenshot',
-    fullscreen: 'vjs-fullscreen',
     controlBar: 'vjs-control-bar',
     navigateLive: 'vjs-navigate-live',
     volumePanel: 'vjs-volume-panel',
@@ -196,7 +192,7 @@ let timeoutKeyboardLeftEvent: any;
 let timeoutKeyboardRightEvent: any;
 let resetPlaybackRate: boolean = true;
 
-const VideoPlayer = memo((props: VideoPlayerProps) => {
+export const VideoPlayer = memo((props: VideoPlayerProps) => {
 
     const idPlayer = useMemo(() => `player-${parseInt(Math.random() * 100)}`, []);
     const idContainerPlayer = useMemo(() => `container-player-${parseInt(Math.random() * 100)}`, []);
@@ -219,7 +215,6 @@ const VideoPlayer = memo((props: VideoPlayerProps) => {
         srcWaterMark = '',
         classNameVideo = '',
         classNameContainer = '',
-        classNameFullscreen = '',
         positionWaterMark = 'top_right',
         styleVideo = {},
         styleContainer = {},
@@ -260,7 +255,6 @@ const VideoPlayer = memo((props: VideoPlayerProps) => {
         onNextSeconds = null,
         onScreenshot = null,
         onClickToLive = null,
-        onToggleFullscreen = null,
         backSeconds = true,
         nextSeconds = true,
         onTimeUpdateEvent = null,
@@ -275,8 +269,7 @@ const VideoPlayer = memo((props: VideoPlayerProps) => {
         hideProgressControl = false,
         controlBar = {
             screenshot: false,
-            zoom: false,
-            fullscreen: false
+            zoom: false
         },
         ...restProps
     } = props;
@@ -398,11 +391,7 @@ const VideoPlayer = memo((props: VideoPlayerProps) => {
     const handleUserInactivePlayer = (event: EventTarget) => {
         callbackFnProps(onHiddenControlBar, event);
     };
-
-    const handleFullscreenEvent = (event: boolean) => {
-        callbackFnProps(onToggleFullscreen, event);
-    };
-
+    
     const disableListeners = () => {
         document.removeEventListener('keyup', backAndForth);
         playControl?.removeEventListener('click', handlePause);
@@ -691,7 +680,7 @@ const VideoPlayer = memo((props: VideoPlayerProps) => {
                     title: "Screenshot",
                     onClick: screenshotVideo,
                     className: CSS_NAMESPACES_VIDEOJS.screenshot,
-                    googleIcon: 'photo_library'
+                    googleIcon: 'photo_size_select_small'
                 });
             } else {
                 removeButtonControlBar({ className: CSS_NAMESPACES_VIDEOJS.screenshot });
@@ -722,26 +711,6 @@ const VideoPlayer = memo((props: VideoPlayerProps) => {
                     }
                     return instanceZoomPlayer;
                 });
-            }
-        }
-        // fullscreen
-        if (controlBar.hasOwnProperty("fullscreen")) {
-            if (controlBar.fullscreen) {
-                createButtonControlBar({
-                    title: "Fullscreen",
-                    onClick: () => {
-                        const container = document.querySelector(!classNameFullscreen ? `#${idContainerPlayer}` : `.${classNameFullscreen}`);
-                        if (!document.fullscreenElement) {
-                            container?.requestFullscreen().then(() => handleFullscreenEvent(true));
-                        } else {
-                            document.exitFullscreen().then(() => handleFullscreenEvent(false));
-                        }
-                    },
-                    className: CSS_NAMESPACES_VIDEOJS.fullscreen,
-                    googleIcon: 'fullscreen'
-                });
-            } else {
-                removeButtonControlBar({ className: CSS_NAMESPACES_VIDEOJS.fullscreen });
             }
         }
         // navigateLive
@@ -1147,7 +1116,7 @@ const VideoPlayer = memo((props: VideoPlayerProps) => {
                     onPause={event => {
                         if (!disabledPause) handlePause(event);
                     }}
-                    className={clsx("video-js rounded-player vjs-theme-fantasy cursor-pointer h-full w-full", classNameVideo)}
+                    className={clsx("video-js rounded-player vjs-theme-fantasy cursor-pointer !h-full !w-full", classNameVideo)}
                     {...restProps}
                 />
                 <Render test={controlBar?.screenshot}>
@@ -1244,5 +1213,3 @@ const VideoPlayer = memo((props: VideoPlayerProps) => {
 }, (prevProps, nextProps) => {
     return JSON.stringify(prevProps) === JSON.stringify(nextProps);
 });
-
-export default VideoPlayer;
