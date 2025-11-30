@@ -4,10 +4,12 @@ import { createContext, useEffect, useState } from "react";
 interface UserProps {
     name?: string | null;
     email?: string | null;
-    admin?: boolean;
+    is_dev?: boolean;
+    is_superxandao?: boolean;
+    is_admin?: boolean;
+    is_moderator?: boolean;
     picture?: string | null;
-    moderator?: boolean;
-    banned?: boolean;
+    is_banned?: boolean;
     banned_until_date?: string | null;
     plan?: string | null;
     customer?: string | null;
@@ -29,10 +31,12 @@ interface AuthenticationProps {
 const INITIAL_STATE_USER: UserProps = {
     name: null,
     email: null,
-    admin: false,
+    is_dev: false,
+    is_superxandao: false,
+    is_admin: false,
+    is_moderator: false,
     picture: null,
-    moderator: false,
-    banned: false,
+    is_banned: false,
     banned_until_date: null,
     plan: "free",
     customer: null,

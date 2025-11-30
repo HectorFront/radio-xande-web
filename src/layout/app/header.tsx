@@ -13,7 +13,7 @@ import {
 } from "@heroui/react";
 import Lottie from 'react-lottie';
 import { useLocation, useNavigate } from "react-router-dom";
-import SpongebobJSON from '@/assets/spongebob.json';
+import LogoBarsJSON from '@/assets/logo_bars.json';
 import { CLIENT_ROUTES } from "@/domain/client/routes";
 import clsx from "clsx";
 import { ModalLogin } from "@/components";
@@ -40,7 +40,7 @@ export default function Header() {
     { text: "Democracia da Live", path: CLIENT_ROUTES.Links },
     { text: "Comunidade", path: CLIENT_ROUTES.Community },
     { text: "Vaquinhas ❤️‍🩹", path: CLIENT_ROUTES.Donations },
-    { text: "Assinaturas", path: CLIENT_ROUTES.Subscriptions },
+    { text: "Seja membro", path: CLIENT_ROUTES.Subscriptions },
   ];
 
   return (
@@ -84,10 +84,11 @@ export default function Header() {
               width={30}
               height={30}
               isClickToPauseDisabled
-              options={{ ...defaultOptionsLottie, animationData: SpongebobJSON }}
+              options={{ ...defaultOptionsLottie, animationData: LogoBarsJSON }}
             />
             <div className="flex flex-row items-center gap-2">
-              <p className="font-bold text-inherit text-xs sm:text-lg">StompeBob MIX</p>
+              <p className="font-bold text-inherit text-xs sm:text-lg">StompeMIX</p>
+              <Chip size="sm" color="primary">Beta</Chip>
             </div>
           </NavbarBrand>
         </NavbarContent>
@@ -97,10 +98,11 @@ export default function Header() {
               width={50}
               height={50}
               isClickToPauseDisabled
-              options={{ ...defaultOptionsLottie, animationData: SpongebobJSON }}
+              options={{ ...defaultOptionsLottie, animationData: LogoBarsJSON }}
             />
             <div className="flex flex-row items-center gap-2">
-              <p className="font-bold text-inherit text-xl">StompeBob MIX</p>
+              <p className="font-bold text-inherit text-xl">StompeMIX</p>
+              <Chip size="sm" color="primary">Beta</Chip>
             </div>
           </NavbarBrand>
           <NavbarItem isActive={location.pathname === CLIENT_ROUTES.Radio}>
@@ -130,7 +132,7 @@ export default function Header() {
           </NavbarItem>
           <NavbarItem isActive={location.pathname === CLIENT_ROUTES.Subscriptions}>
             <Link className="font-semibold cursor-pointer hover:opacity-80" color="foreground" onClick={() => navigate(CLIENT_ROUTES.Subscriptions)}>
-              Assinaturas
+              Seja membro
             </Link>
           </NavbarItem>
         </NavbarContent>

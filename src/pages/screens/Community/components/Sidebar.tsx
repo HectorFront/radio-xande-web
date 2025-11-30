@@ -5,7 +5,7 @@ export default function Sidebar() {
       <div className="bg-neutral-700 border border-neutral-700 rounded-lg p-4">
         <h3 className="font-bold text-lg mb-3 text-neutral-100">Sobre a comunidade</h3>
         <p className="text-sm text-neutral-300 mb-4">
-          Bem-vindo(a) à comunidade da StompeBob MIX! Compartilhe suas zueiras, envie distorções, planeje ataques coordenados e conecte-se com outros.
+          Bem-vindo(a) à comunidade da StompeMIX! Compartilhe suas zueiras, envie distorções, planeje ataques coordenados e conecte-se com outros.
         </p>
         <div className="space-y-2 text-sm">
           <div className="flex justify-between">
@@ -55,13 +55,13 @@ export default function Sidebar() {
         <div className="space-y-2">
           <div className="flex items-center space-x-2">
             <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center">
-              <span className="text-white text-xs font-bold">M</span>
+              <span className="text-white text-xs font-bold">A</span>
             </div>
-            <span className="text-sm text-neutral-200">u/samsepioldev</span>
+            <span className="text-sm text-neutral-200">u/samsepiol</span>
           </div>
           <div className="flex items-center space-x-2">
-            <div className="w-6 h-6 bg-blue-800 rounded-full flex items-center justify-center">
-              <span className="text-white text-xs font-bold">M</span>
+            <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center">
+              <span className="text-white text-xs font-bold">A</span>
             </div>
             <span className="text-sm text-neutral-200">u/superxandao</span>
           </div>
@@ -72,13 +72,13 @@ export default function Sidebar() {
         <h3 className="font-bold text-lg mb-3 text-neutral-100">Moderadores</h3>
         <div className="space-y-2">
           <div className="flex items-center space-x-2">
-            <div className="w-6 h-6 bg-green-800 rounded-full flex items-center justify-center">
+            <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center">
               <span className="text-white text-xs font-bold">M</span>
             </div>
-            <span className="text-sm text-neutral-200">u/samsepioldev</span>
+            <span className="text-sm text-neutral-200">u/samsepiol</span>
           </div>
           <div className="flex items-center space-x-2">
-            <div className="w-6 h-6 bg-green-800 rounded-full flex items-center justify-center">
+            <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center">
               <span className="text-white text-xs font-bold">M</span>
             </div>
             <span className="text-sm text-neutral-200">u/superxandao</span>
