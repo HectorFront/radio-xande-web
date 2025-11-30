@@ -278,10 +278,10 @@ export const PlayerDrawerProvider = memo(({ children }: { children: ReactNode })
                                     {
                                         "bg-neutral-500 cursor-default": loadingCurrentChunk,
                                         "bg-danger-500 hover:bg-danger-300 cursor-pointer": !loadingCurrentChunk,
-                                        "opacity-0": !isHovered || !loadingCurrentChunk,
-                                        "opacity-100": isHovered || loadingCurrentChunk
+                                        "opacity-0": !isHovered || isPlaying || !loadingCurrentChunk,
+                                        "opacity-100": !isPlaying || isHovered || loadingCurrentChunk
                                     },
-                                    "w-10 h-10 flex items-center justify-center shadow-xl",
+                                    "w-12 h-12 flex items-center justify-center shadow-xl",
                                     "rounded-full select-none transition-all duration-300 z-50 absolute"
                                 )}
                                 onClick={handlePause}

@@ -1,11 +1,12 @@
 /** @name Dependencies */
-import {Suspense, lazy, useLayoutEffect} from 'react';
+import {Suspense, lazy, useContext, useLayoutEffect} from 'react';
 import {HashRouter, Routes, Route} from 'react-router-dom';
 import NotificationsSystem, {bootstrapTheme, useNotifications, setUpNotifications} from 'reapop';
 /** @name External */
 import {App} from '@/layout';
 import {PUBLIC_ROUTES} from '@/pages/paths';
 import {Fallback, setNotificationApp} from '@/components';
+import { ContextAuthentication } from '@/contexts/Authentication';
 
 const Home = lazy(() => import("@/pages/screens/Radio").then());
 
@@ -38,7 +39,7 @@ const RenderRoutes = ({routes}) => {
 };
 
 export const AppRoutes = () => {
-    const loadingAuth = false;
+    const {loadingAuth} = useContext(ContextAuthentication);
     const {notifications, notify, dismissNotification} = useNotifications();
     useLayoutEffect(() => {
         setNotificationApp({ notify, dismissNotification });
@@ -53,7 +54,6 @@ export const AppRoutes = () => {
                         :
                         <>
                             <RenderRoutes
-                                authenticated={false}
                                 routes={PUBLIC_ROUTES}
                             />
                             <NotificationsSystem

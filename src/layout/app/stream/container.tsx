@@ -107,7 +107,13 @@ export const ContainerStream = () => {
     }, [streamYT, streamKick]);
 
     return (
-        <div className={clsx(streamYT.is_live ? "min-h-60" : "min-h-30", "w-full bg-center gap-4 bg-cover flex flex-col py-4 px-4 lg:px-10")} style={{ backgroundImage: `url(${BannerHeader})` }}>
+        <div 
+            className={clsx(
+                streamYT.is_live ? "min-h-60" : "min-h-30", 
+                "w-full gap-4 bg-cover flex flex-col py-4 px-4 lg:px-10"
+            )} 
+            style={{ backgroundPositionY: "40%", backgroundImage: `url(${streamKick.banner_image.url || BannerHeader})` }}
+        >
             <Card className="max-w-fit bg-black/80 border-white/20 mx-auto">
                 <Render test={ad}>
                     <CardBody className="flex flex-row flex-wrap items-center px-5 gap-5">
@@ -129,9 +135,9 @@ export const ContainerStream = () => {
                 <Render test={streamKick.livestream?.is_live}>
                     <LiveStreamKickTV />
                 </Render>
-                <Render test={streamYT.is_live}>
+                {/* <Render test={streamYT.is_live}>
                     <LiveStreamYouTube videoId={streamYT.video_id} />
-                </Render>
+                </Render> */}
             </div>
         </div>
     );

@@ -25,7 +25,7 @@ type ModalLoginProps = {
 
 export const ModalRegister = ({ open, onClose: onCloseProp }: ModalLoginProps) => {
     const { isOpen, onOpen, onClose } = useDisclosure();
-    const { setAuthentication } = useContext(ContextAuthentication)
+    const { setUser, setAuthentication } = useContext(ContextAuthentication)
     const [loadingRegister, setLoadingRegister] = useState(false);
     const [blockedFacebook, setFacebookBlocked] = useState(false);
     const [openOAuthBigTech, setOpenOAuthBigTech] = useState(false);
@@ -46,12 +46,20 @@ export const ModalRegister = ({ open, onClose: onCloseProp }: ModalLoginProps) =
         setOpenOAuthBigTech(false);
     };
 
+    const handleResponseAuthentication = (response) => {
+        let user = structuredClone(response);
+        let login = structuredClone(response.login[0]);
+        delete user.login;
+        setUser(user);
+        setAuthentication(login);
+    }
+
     const handleGoogleResponse = useCallback((response) => {
         // access_token
         setOpenOAuthBigTech(false);
         const { data } = response;
         ExecutorRequest(new RequestOAuthRegister({ access_token: data.access_token }, "google"))
-            .then(response => setAuthentication(response))
+            .then(handleResponseAuthentication)
             .catch(_err => Alert.error("Algo deu errado", "Vamos analisar o problema em breve"));
     }, []);
 
@@ -60,7 +68,7 @@ export const ModalRegister = ({ open, onClose: onCloseProp }: ModalLoginProps) =
         setOpenOAuthBigTech(false);
         const { data } = response;
         ExecutorRequest(new RequestOAuthRegister({ access_token: data.accessToken }, "facebook"))
-            .then(response => setAuthentication(response))
+            .then(handleResponseAuthentication)
             .catch(_err => Alert.error("Algo deu errado", "Vamos analisar o problema em breve"));
     }, []);
 
@@ -80,7 +88,7 @@ export const ModalRegister = ({ open, onClose: onCloseProp }: ModalLoginProps) =
                         >
                             <Button
                                 size="lg"
-                                onPress={e => e.preventDefault()}
+                                onPress={e => e?.preventDefault()}
                                 className="bg-white text-black font-semibold w-full text-sm"
                             >
                                 <img src={ImgGoogleIcon} alt="Google" width={20} />&nbsp;Continuar com o Google
@@ -96,7 +104,7 @@ export const ModalRegister = ({ open, onClose: onCloseProp }: ModalLoginProps) =
                             <Button
                                 size="lg"
                                 disabled={blockedFacebook}
-                                onPress={e => e.preventDefault()}
+                                onPress={e => e?.preventDefault()}
                                 className="bg-[#1877f2] text-white font-semibold w-full text-sm"
                             >
                                 <img src={ImgFacebookIcon} alt="Facebook" width={20} />&nbsp;Continuar com o Facebook

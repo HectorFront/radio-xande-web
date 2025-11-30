@@ -1,1 +1,1 @@
-export * from './POST';
+export * from './POST/provider';

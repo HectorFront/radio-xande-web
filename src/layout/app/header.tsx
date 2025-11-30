@@ -9,16 +9,19 @@ import {
   NavbarItem,
   Link,
   Button,
-  Chip
+  Chip,
+  Avatar,
+  AvatarIcon
 } from "@heroui/react";
 import Lottie from 'react-lottie';
 import { useLocation, useNavigate } from "react-router-dom";
 import LogoBarsJSON from '@/assets/logo_bars.json';
 import { CLIENT_ROUTES } from "@/domain/client/routes";
 import clsx from "clsx";
-import { ModalLogin } from "@/components";
+import { ModalLogin, Render } from "@/components";
 import { ModalRegister } from "@/components/ModalRegister";
 import { usePlayerDrawerContext } from "@/contexts/PlayerDrawer";
+import { ContextAuthentication } from "@/contexts/Authentication";
 
 export default function Header() {
   const location = useLocation();
@@ -27,6 +30,7 @@ export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [modalLoginOpen, setModalLoginOpen] = useState(false);
   const [modalRegisterOpen, setModalRegisterOpen] = useState(false);
+  const { user, authenticated } = useContext(ContextAuthentication);
 
   const defaultOptionsLottie = {
     loop: true,
@@ -140,16 +144,29 @@ export default function Header() {
             </Link>
           </NavbarItem>
         </NavbarContent>
-        <NavbarContent justify="end">
-          <NavbarItem>
-            <Link onPress={() => setModalLoginOpen(true)} color="foreground" className="cursor-pointer font-semibold">Login</Link>
-          </NavbarItem>
-          <NavbarItem>
-            <Button className="font-semibold" onPress={() => setModalRegisterOpen(true)} as={Link} color="danger" variant="flat">
-              Criar conta
-            </Button>
-          </NavbarItem>
-        </NavbarContent>
+          <NavbarContent justify="end">
+            <Render test={!authenticated}>
+                <NavbarItem>
+                  <Link onPress={() => setModalLoginOpen(true)} color="foreground" className="cursor-pointer font-semibold">Login</Link>
+                </NavbarItem>
+                <NavbarItem>
+                  <Button className="font-semibold" onPress={() => setModalRegisterOpen(true)} as={Link} color="danger" variant="flat">
+                    Criar conta
+                  </Button>
+                </NavbarItem>
+            </Render>
+            <Render test={authenticated}>
+              <NavbarItem>
+                <Avatar
+                  classNames={{
+                    base: clsx({ "bg-linear-to-br from-[#FFB457] to-[#FF705B]": !user.picture }),
+                    icon: "text-black/80",
+                  }}
+                  icon={user.picture ? <img src={user.picture} className="w-full h-full rounded-full" alt="Foto de perfil" /> : <AvatarIcon />}
+                />
+              </NavbarItem>
+            </Render>
+          </NavbarContent>
         <NavbarMenu>
           {menuItems.map(({ text, path }, index) => (
             <NavbarMenuItem key={`link-${index}`}>

@@ -18,10 +18,10 @@ interface Post {
 const mockPosts: Post[] = [
   {
     id: '1',
-    title: 'Amazing live stream from last night!',
-    content: 'Check out this incredible performance that happened during the live stream. The energy was absolutely amazing!',
+    title: 'Exemplo 1',
+    content: 'Descrição do post 1',
     author: 'musiclover123',
-    timestamp: '2 hours ago',
+    timestamp: '2 horas atrás',
     likes: 245,
     dislikes: 12,
     comments: 34,
@@ -31,10 +31,10 @@ const mockPosts: Post[] = [
   },
   {
     id: '2',
-    title: 'What do you think about the new radio format?',
-    content: 'I\'ve been listening to the new format for a few weeks now and I have mixed feelings. The music selection is great but I miss some of the old segments.',
+    title: 'Exemplo 2',
+    content: 'Descrição post 2',
     author: 'radiofan',
-    timestamp: '4 hours ago',
+    timestamp: '4 horas atrás',
     likes: 89,
     dislikes: 23,
     comments: 67,
@@ -42,27 +42,14 @@ const mockPosts: Post[] = [
   },
   {
     id: '3',
-    title: 'Behind the scenes photo from today\'s recording',
-    author: 'studiotech',
-    timestamp: '6 hours ago',
+    title: 'Exemplo 3',
+    author: 'Descrição post 3',
+    timestamp: '6 horas atrás',
     likes: 156,
     dislikes: 5,
     comments: 28,
     type: 'image',
-    mediaUrl: 'https://via.placeholder.com/800x600'
-  },
-  {
-    id: '4',
-    title: 'Exclusive interview with tonight\'s guest',
-    content: 'Don\'t miss this exclusive interview! We talked about their new album, upcoming tour, and some surprising revelations.',
-    author: 'hostuser',
-    timestamp: '8 hours ago',
-    likes: 312,
-    dislikes: 18,
-    comments: 92,
-    type: 'video',
-    mediaUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
-    thumbnail: 'https://via.placeholder.com/640x360'
+    mediaUrl: 'https://scontent.cdninstagram.com/v/t51.71878-15/587730601_1569589660735144_3215436608533906169_n.jpg?stp=dst-jpg_e15_tt6&_nc_cat=108&ig_cache_key=Mzc3NTc5MTkwNjc1NzM3MjkzNw%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6InhwaWRzLjY0MHgxMTM2LnNkci5DMyJ9&_nc_ohc=cBN51UGE2_gQ7kNvwH0HL8v&_nc_oc=AdnEZ2QOc2nAHE0SEcHfp3xM7V2L7wgHuOgz_4agaJWhUhzvBUeyDnsKWJLEE6cJWRk&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=scontent.cdninstagram.com&_nc_gid=cuYvsmiljrrCGYFFZ4lXpQ&oh=00_AflAj7CVT-qS_WNVEy9lCf9nClXJgFoTr0V1vUx4yPYcsg&oe=6934D22F'
   }
 ];
 

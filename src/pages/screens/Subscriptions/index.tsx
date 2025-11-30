@@ -26,7 +26,7 @@ const FEATURES_SUBSCRIPTION = [
     "Publicar vídeos de até 114MB",
     "Manter fixado sugestão para a Democracia da Live",
     "Também ajuda o Xandão e SamSepiol manter a plataforma online para todos",
-    "Após 3 meses de assinatura, envie 5 gifs customizados e ganhe uma conta Premium no app Mexpenses"
+    "Após 3 meses de assinatura, envie 5 gifs customizados e ganhe uma conta com 3 meses Premium no app Mexpenses"
 ];
 
 export default function Subscriptions() {
@@ -45,11 +45,11 @@ export default function Subscriptions() {
                     />
                 </div>
                 <div className="grid gap-6">
-                    <h3 className="text-3xl font-bold text-blue-400">É Blue!</h3>
+                    <h3 className="text-3xl font-bold text-red-400">É Red!</h3>
                     <ul className="flex flex-col gap-3 text-sm">
                         {FEATURES_SUBSCRIPTION.map((item) => (
                             <li key={item} className="flex items-center text-zinc-300">
-                                <Icon name="check" className="text-blue-400 mr-2 shrink-0" />
+                                <Icon name="check" className="text-red-400 mr-2 shrink-0" />
                                 {item}
                             </li>
                         ))}
@@ -57,11 +57,11 @@ export default function Subscriptions() {
                 </div>
                 <div className="flex flex-col gap-4 text-center">
                     <div className="flex flex-row items-end justify-center gap-2">
-                        <h4 className="text-4xl whitespace-nowrap font-bold text-blue-400">R$ 24,99</h4>
+                        <h4 className="text-4xl whitespace-nowrap font-bold text-red-400">R$ 24,99</h4>
                         <span className="text-lg text-zinc-400 font-bold">/ Mês</span>
                     </div>
                     <a href="#" className="block">
-                        <button className="w-full h-14 cursor-pointer px-6 py-2 rounded-full border border-blue-400 text-blue-400 hover:text-white hover:border-blue-500 hover:bg-blue-500 transition">
+                        <button className="w-full h-14 cursor-pointer px-6 py-2 rounded-full border border-red-400 text-red-400 hover:text-white hover:border-red-500 hover:bg-red-500 transition">
                             <span className="block text-xl font-bold">Começar agora</span>
                         </button>
                     </a>
@@ -69,15 +69,21 @@ export default function Subscriptions() {
             </div>
             <div className="w-full grid relative items-start gap-10 border border-neutral-800 rounded-2xl p-8 bg-neutral-900">
                 <div className="grid gap-6">
-                    <h3 className="text-2xl">Gratuito</h3>
+                    <h3 className="text-2xl text-blue-400">É Blue?</h3>
                     <ul className="flex flex-col gap-3 text-sm">
                         {FEATURES_FREE.map((item) => (
                             <li key={item} className="flex items-center text-zinc-400">
-                                <Icon name="check" className="text-white mr-2 shrink-0" />
+                                <Icon name="check" className="text-blue-400 mr-2 shrink-0" />
                                 {item}
                             </li>
                         ))}
                     </ul>
+                </div>
+                 <div className="flex flex-col gap-4 text-center">
+                    <div className="flex flex-row items-end justify-center gap-2">
+                        <h4 className="text-4xl whitespace-nowrap font-semibold text-blue-400">Gratuito</h4>
+                        <span className="text-lg text-zinc-400 font-bold">/ Mês</span>
+                    </div>
                 </div>
             </div>
         </div>
