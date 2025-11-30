@@ -6,6 +6,10 @@ html {
     scroll-behavior: smooth;
 }
 
+body * {
+  cursor: url('./assets/cursor_pointer.png') 1 1, auto !important;
+}
+
 body {
     display: flex;
     min-height: 100%;

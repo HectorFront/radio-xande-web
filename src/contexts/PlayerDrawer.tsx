@@ -40,6 +40,7 @@ export const PlayerDrawerProvider = memo(({ children }: { children: ReactNode })
     const [isDragging, setIsDragging] = useState(false);
     const [volume, setVolume] = useState(1);
     const [buffered, setBuffered] = useState(0);
+     const [isHovered, setIsHovered] = useState(false);
     const [isVolumeDragging, setIsVolumeDragging] = useState(false);
     const [seekingTime, setSeekingTime] = useState<number | null>(null);
     const [isPlaying, setCurrentPlaying] = useState(false);
@@ -109,6 +110,15 @@ export const PlayerDrawerProvider = memo(({ children }: { children: ReactNode })
             if (!isOpen) onOpen();
             return;
         }
+        if (isPlaying) {
+            audioRef.current.pause();
+        } else {
+            if (!isOpen) onOpen();
+            audioRef.current.play();
+        }
+    };
+
+    const handlePause = () => {
         if (isPlaying) {
             audioRef.current.pause();
         } else {
@@ -253,14 +263,36 @@ export const PlayerDrawerProvider = memo(({ children }: { children: ReactNode })
         }}>
             {isOpen && (
                 <div
+                    onMouseEnter={() => setIsHovered(true)}
+                    onMouseLeave={() => setIsHovered(false)}
                     className="fixed bottom-0 left-0 right-0 bg-neutral-950/95 rounded-t-xl px-6 py-3 h-28 z-50"
                 >
                     <div className="flex flex-row flex-1 items-start gap-4">
                         <div
-                            className="w-18 h-18 bg-neutral-700 rounded-lg bg-cover flex items-center justify-center"
+                            className="w-18 h-18 bg-neutral-700 rounded-lg bg-cover flex items-center justify-center relative"
                             style={{ backgroundImage: `url(${IMAGE_URL})`, backgroundPosition: "50%" }}
                         >
                             {!currentMusic?.filename_image && <Icon name="album" className="text-neutral-600 absolute" style={{ fontSize: 50 }} filled />}
+                            <div
+                                className={clsx(
+                                    {
+                                        "bg-neutral-500 cursor-default": loadingCurrentChunk,
+                                        "bg-danger-500 hover:bg-danger-300 cursor-pointer": !loadingCurrentChunk,
+                                        "opacity-0": !isHovered || !loadingCurrentChunk,
+                                        "opacity-100": isHovered || loadingCurrentChunk
+                                    },
+                                    "w-10 h-10 flex items-center justify-center shadow-xl",
+                                    "rounded-full select-none transition-all duration-300 z-50 absolute"
+                                )}
+                                onClick={handlePause}
+                            >
+                                <Icon 
+                                    filled
+                                    spin={loadingCurrentChunk}
+                                    style={{ fontSize: loadingCurrentChunk ? 25 : 30 }}
+                                    name={loadingCurrentChunk ? "music_note" : isPlaying ? "pause" : "play_arrow"} 
+                                />
+                            </div>
                         </div>
                         <div className="flex-1">
                             <div className="flex flex-row items-start justify-between">

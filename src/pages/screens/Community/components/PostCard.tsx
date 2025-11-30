@@ -89,7 +89,7 @@ export default function PostCard({ post, onVote }: PostCardProps) {
         {/* Content section */}
         <div className="flex-1 p-4">
           <div className="flex items-center text-xs text-neutral-400 mb-2">
-            <span>StompeMIX/comunidade</span>
+            <span>SuperXandeMEX/comunidade</span>
             <span className="mx-1">•</span>
             <span>Publicado por u/{post.author}</span>
             <span className="mx-1">•</span>

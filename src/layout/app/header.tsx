@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import {
   Navbar,
   NavbarBrand,
@@ -18,21 +18,23 @@ import { CLIENT_ROUTES } from "@/domain/client/routes";
 import clsx from "clsx";
 import { ModalLogin } from "@/components";
 import { ModalRegister } from "@/components/ModalRegister";
-
-export const defaultOptionsLottie = {
-  loop: true,
-  autoplay: true,
-  rendererSettings: {
-    preserveAspectRatio: 'xMidYMid slice'
-  }
-};
+import { usePlayerDrawerContext } from "@/contexts/PlayerDrawer";
 
 export default function Header() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { isPlayingMusic } = usePlayerDrawerContext();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [modalLoginOpen, setModalLoginOpen] = useState(false);
   const [modalRegisterOpen, setModalRegisterOpen] = useState(false);
+
+  const defaultOptionsLottie = {
+    loop: true,
+    autoplay: isPlayingMusic,
+    rendererSettings: {
+      preserveAspectRatio: 'xMidYMid slice'
+    }
+  };
 
   const menuItems = [
     { text: "Rádio", path: CLIENT_ROUTES.Radio },
@@ -84,10 +86,11 @@ export default function Header() {
               width={30}
               height={30}
               isClickToPauseDisabled
+              isPaused={!isPlayingMusic}
               options={{ ...defaultOptionsLottie, animationData: LogoBarsJSON }}
             />
             <div className="flex flex-row items-center gap-2">
-              <p className="font-bold text-inherit text-xs sm:text-lg">StompeMIX</p>
+              <p className="font-bold text-inherit text-xs sm:text-lg">SuperXandeMEX</p>
               <Chip size="sm" color="primary">Beta</Chip>
             </div>
           </NavbarBrand>
@@ -98,10 +101,11 @@ export default function Header() {
               width={50}
               height={50}
               isClickToPauseDisabled
+              isPaused={!isPlayingMusic}
               options={{ ...defaultOptionsLottie, animationData: LogoBarsJSON }}
             />
             <div className="flex flex-row items-center gap-2">
-              <p className="font-bold text-inherit text-xl">StompeMIX</p>
+              <p className="font-bold text-inherit text-xl">SuperXandeMEX</p>
               <Chip size="sm" color="primary">Beta</Chip>
             </div>
           </NavbarBrand>

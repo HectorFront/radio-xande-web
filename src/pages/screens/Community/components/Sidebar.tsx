@@ -5,7 +5,7 @@ export default function Sidebar() {
       <div className="bg-neutral-700 border border-neutral-700 rounded-lg p-4">
         <h3 className="font-bold text-lg mb-3 text-neutral-100">Sobre a comunidade</h3>
         <p className="text-sm text-neutral-300 mb-4">
-          Bem-vindo(a) à comunidade da StompeMIX! Compartilhe suas zueiras, envie distorções, planeje ataques coordenados e conecte-se com outros.
+          Bem-vindo(a) à comunidade da SuperXandeMEX! Compartilhe suas zueiras, envie distorções, planeje ataques coordenados de PIX e conecte-se com outros.
         </p>
         <div className="space-y-2 text-sm">
           <div className="flex justify-between">
